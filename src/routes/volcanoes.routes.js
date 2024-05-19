@@ -30,7 +30,7 @@ router.get('/', async function (req, res, next) {
         res.status(200).json(volcanoes);
     } catch (err) {
         // Return an error if failed to get volcanoes by country
-        return next(createError(400, true, { message: err.message }));
+        return next(createError(400, { message: err.message }));
     }
 });
 
