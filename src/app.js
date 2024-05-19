@@ -45,19 +45,19 @@ app.use(express.static(path.join(__dirname, 'public'))); // Serve static files f
 
 
 // --------------------- Routes ---------------------
-// Documentation
+// Swagger Docs
 app.get('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-// Data
+// Data API
 app.use('/countries', countriesRouter); // Countries routes
 app.use('/volcanoes', volcanoesRouter); // Volcanoes routes
 app.use('/volcano', volcanoRouter); // Volcano routes
-// Authentication
+// Authentication API
 app.use('/user', userRouter); // User routes
-// Profile
+// Profile API
 app.use('/profile', authenticateToken, userRouter); // Profile route
-// Administration
+// Administration API
 app.use('/me', AdministrationRouter); // Administration route
-// 404 error
+// 404 Error
 app.use(function (req, res, next) { next(createError(404, 'Not Found')); }); // 404 error, forwarded to error handler
 
 
@@ -69,7 +69,6 @@ app.use(function (err, req, res, next) {
 
   // Render the error page (or send JSON response for API errors)
   res.status(err.status || 500);
-  // res.render('error'); // Or 
   res.json({ error: true, message: err.message })
 });
 
