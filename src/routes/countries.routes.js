@@ -4,8 +4,6 @@ const CountryDAO = require('../dao/country.dao');
 
 // Register Route middleware
 router.use((req, res, next) => {
-    // DEBUG
-    console.log('Countries route');
     // Create a new instance of CountryDAO and attach it to the request object
     req.countryDAO = new CountryDAO(req.db);
     next();
@@ -21,7 +19,7 @@ router.get('/', async function (req, res, next) {
         res.status(200).json(countries.map(country => country.country));
     } catch (err) {
         // Return an error if failed to get countries
-        next(createError(400, err.message));
+        next(createError(err.status || 500, err.message || 'Failed to get countries'));
     }
 });
 

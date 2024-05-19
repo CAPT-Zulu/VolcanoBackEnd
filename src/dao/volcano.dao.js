@@ -1,4 +1,4 @@
-import HttpException from '../exceptions/HttpException';
+const HttpException = require('../exceptions/HttpException');
 
 // Volcano Data Access Object
 class VolcanoDAO {
@@ -16,19 +16,24 @@ class VolcanoDAO {
     async getVolcanoById(id, authenticated = false) {
         try {
             // If id is not provided, throw an error
-            if (!id) throw new HttpException(400, 'Id is a required query parameter.');
+            if (!id) throw new HttpException(404, 'Volcano ID not found.');
 
             // Select * if user is authenticated, otherwise select nonAuthFields
             const select = authenticated ? '*' : this.nonAuthFields;
 
-            // Return the volcano with the provided id
-            return this.db.select(select)
+            // Retrieve the volcano by id
+            const volcano = await this.db.select(select)
                 .where('id', id)
                 .first();
 
-        } catch (error) {
+            // If volcano is not found, throw an error
+            if (!volcano) throw new HttpException(404, `Volcano with ID: ${id} not found.`);
+
+            // Return the volcano
+            return volcano;
+        } catch (err) {
             // Throw an error if failed to retrieve volcano by id
-            throw new HttpException(500, error.message);
+            throw new HttpException(err.status || 500, err.message || 'Failed to get volcano by id');
         }
     }
 
@@ -55,9 +60,9 @@ class VolcanoDAO {
 
             // Return the query
             return await query;
-        } catch (error) {
+        } catch (err) {
             // Throw an error if failed to retrieve volcanoes by country
-            throw new HttpException(500, error.message);
+            throw new HttpException(err.status || 500, err.message || 'Failed to get volcanoes by country');
         }
     }
 }

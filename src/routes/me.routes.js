@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-// me route
+// Me route (Used for assessment purposes)
 router.get('/', (req, res) => {
     // Return owner details saved in .env
     res.json({

@@ -1,4 +1,4 @@
-import HttpException from '../exceptions/HttpException';
+const HttpException = require('../exceptions/HttpException');
 
 // Country Data Access Object 
 class CountryDAO {
