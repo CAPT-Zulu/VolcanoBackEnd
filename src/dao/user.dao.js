@@ -1,14 +1,19 @@
 // DAO for interacting with the users data
 const bcrypt = require("bcrypt");
+const moment = require('moment');
 
 class UserDAO {
     constructor(db) {
         // Attach the Knex instance to the DAO
         this.db = db;
+        // Define non restricted fields when user is authenticated
+        this.restrictedFields = ['email', 'firstName', 'lastName', 'dob', 'address'];
+        // Define non restricted fields when user is not authenticated
+        this.nonRestrictedFields = ['email', 'firstName', 'lastName'];
     }
 
     // Find a user by their email
-    findUserByEmail(email) {
+    async findUserByEmail(email) {
         try {
             // Check if email is provided
             if (!email) {
@@ -26,7 +31,7 @@ class UserDAO {
     }
 
     // Create a new user
-    createUser(email, password) {
+    async createUser(email, password) {
         try {
             // Check if email and password are provided
             if (!email || !password) {
@@ -81,17 +86,29 @@ class UserDAO {
     }
 
     // Get user profile by email
-    getProfile(email) {
+    async getProfile(email, authenticated) {
         try {
             // Check if email is provided
             if (!email) {
                 throw new Error("Email is required");
             }
-            // Return the user profile with the provided email
-            return this.db('users')
-                .select('email', 'firstName', 'lastName', 'dob', 'address')
-                .where({ email })
-                .first();
+            // Check if authenticated user is requesting their own profile
+            const select = authenticated && email === authenticated.email ? this.restrictedFields : this.nonRestrictedFields;
+            // Retrieve the user profile by email
+            const profile = await this.db('users').select(select).where({ email }).first();
+            // Check if profile exists
+            if (!profile) {
+                throw new Error("User not found");
+            }
+            // Fix the date of birth format
+            if (profile.dob) {
+                profile.dob = moment(profile.dob).format('YYYY-MM-DD');
+            }
+            // Return the user profile
+            return profile;
+
+            // // Return the user profile with the provided email
+            // return this.db('users').select(select).where({ email }).first();
         } catch (err) {
             // Return an error if failed to get user profile
             throw new Error(err.message);
@@ -99,14 +116,20 @@ class UserDAO {
     }
 
     // Update user profile
-    updateProfile(email, profile) {
+    async updateProfile(email, profile, authenticated) {
         try {
             // Check if email and profile are provided
             if (!email || !profile) {
                 throw new Error("Email and profile are required");
             }
+            // Check if authenticated user is updating their own profile
+            if (!authenticated || email !== authenticated.email) {
+                throw new Error("Unauthorized");
+            }
+
             // Update the user profile with the provided email
             return this.db('users')
+                .select(this.restrictedFields)
                 .where({ email })
                 .update(profile);
         } catch (err) {

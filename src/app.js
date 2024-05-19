@@ -58,14 +58,6 @@ app.use('/me', AdministrationRouter); // Administration route
 // Documentation
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // Swagger docs
 
-// Knex test route DEBUG
-// app.get('/knex', function (req, res, next) {
-//   req.db.raw("SELECT VERSION()").then(
-//     (version) => console.log((version[0][0]))
-//   ).catch((err) => { console.log(err); throw err })
-//   res.send("Version Logged successfully");
-// });
-
 app.use(function (req, res, next) { next(createError(404)); }); // 404 error, forwarded to error handler
 
 

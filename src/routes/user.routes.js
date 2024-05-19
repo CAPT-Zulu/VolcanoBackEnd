@@ -1,6 +1,7 @@
 const express = require("express");
 const createError = require('http-errors');
 const router = express.Router();
+const authenticateToken = require('../middleware/auth.middleware');
 const UserDAO = require("../dao/user.dao");
 const jwt = require("jsonwebtoken");
 
@@ -74,54 +75,77 @@ router.post("/login", async (req, res, next) => {
 });
 
 // Get Profile Route
-router.get("/:email/profile", async (req, res, next) => {
+router.get("/:email/profile", authenticateToken, async (req, res, next) => {
   try {
-    const profile = await req.userDAO.getProfile(req.params.email);
-
-    if (!profile) {
-      return next(createError(404, "User not found"));
+    // Check if email is provided
+    if (!req.params.email) {
+      return next(createError(400, "Email is a required parameter"));
     }
 
+    // Retrieve profile by email
+    const profile = await req.userDAO.getProfile(req.params.email, req.user);
+
+    // Return profile with 200 status code
     res.status(200).json(profile);
   } catch (err) {
-    next(err);
+    // If error is thrown, check if it's a user not found error
+    if (err.message === "User not found") {
+      // Return 404 error if user not found
+      return next(createError(404, err.message));
+    }
+    // Return an error if failed to get profile
+    return next(createError(400, err.message));
   }
 });
 
 // Update Profile Route
-router.put("/:email/profile", async (req, res, next) => {
+router.put("/:email/profile", authenticateToken, async (req, res, next) => {
   try {
-    const userEmail = req.params.email;
-    const { firstName, lastName, dob, address } = req.body;
+    if (req.user) {
+      const userEmail = req.params.email;
+      const { firstName, lastName, dob, address } = req.body;
 
-    // Input validation
-    if (!firstName || !lastName || !dob || !address) {
-      return next(createError(400, "Request body incomplete: firstName, lastName, dob and address are required."));
+      // Input validation
+      if (!firstName || !lastName || !dob || !address) {
+        return next(createError(400, "Request body incomplete: firstName, lastName, dob and address are required."));
+      }
+
+      if (typeof firstName !== 'string' || typeof lastName !== 'string' || typeof address !== 'string') {
+        return next(createError(400, "Request body invalid: firstName, lastName and address must be strings only."));
+      }
+
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || isNaN(new Date(dob)) || dob !== new Date(dob).toISOString().split('T')[0]) {
+        return next(createError(400, "Invalid input: dob must be a real date in format YYYY-MM-DD."));
+      }
+
+      if (new Date(dob) > new Date()) {
+        return next(createError(400, "Invalid input: dob must be a date in the past."));
+      }
+
+
+      // Authentication check
+      if (userEmail !== req.user.email) {
+        return next(createError(403, "Forbidden"));
+      }
+
+      await req.userDAO.updateProfile(userEmail, { firstName, lastName, dob, address }, req.user);
+      const updatedProfile = await req.userDAO.getProfile(userEmail, req.user);
+
+      res.status(200).json(updatedProfile);
+    } else {
+      return next(createError(401, "Unauthorized"));
     }
-
-    if (typeof firstName !== 'string' || typeof lastName !== 'string' || typeof address !== 'string') {
-      return next(createError(400, "Request body invalid: firstName, lastName and address must be strings only."));
-    }
-
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
-      return next(createError(400, "Invalid input: dob must be a real date in format YYYY-MM-DD."));
-    }
-
-    if (new Date(dob) > new Date()) {
-      return next(createError(400, "Invalid input: dob must be a date in the past."));
-    }
-
-    // Authentication check
-    if (userEmail !== req.user.email) {
-      return next(createError(403, "Forbidden"));
-    }
-
-    await req.userDAO.updateProfile(userEmail, { firstName, lastName, dob, address });
-    const updatedProfile = await req.userDAO.getProfile(userEmail);
-
-    res.status(200).json(updatedProfile);
   } catch (err) {
-    next(err);
+    // If error is thrown, check if it's a user not found error
+    if (err.message === "User not found") {
+      // Return 404 error if user not found
+      return next(createError(404, err.message));
+    } else if (err.message === "Unauthorized") {
+      // Return 401 error if user is not authenticated
+      return next(createError(401, err.message));
+    }
+    // Return an error if failed to update profile
+    return next(createError(400, err.message));
   }
 });
 
