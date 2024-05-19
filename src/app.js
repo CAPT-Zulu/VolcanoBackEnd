@@ -20,7 +20,6 @@ const AdministrationRouter = require('./routes/me.routes');
 // Middleware
 const dbMiddleware = require('./middleware/db.middleware');
 const authenticateToken = require('./middleware/auth.middleware');
-// const errorHandler = require('./middleware/error.middleware');
 
 
 // --------------------- App ---------------------
