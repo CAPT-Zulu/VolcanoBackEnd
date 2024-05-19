@@ -1,15 +1,22 @@
-// DAO (Data Access Object) for interacting with the countries data
+// Country Data Access Object 
 class CountryDAO {
     constructor(db) {
+        // Attach the Knex instance to the DAO
         this.db = db;
     }
 
     // Get a list of all countries associated with volcanoes
     getCountries() {
-        return this.db('volcanoes')
-            .select('country')
-            .distinct()
-            .orderBy('country', 'asc');
+        try {
+            // Return a list of all countries associated with volcanoes
+            return this.db('data')
+                .select('country')
+                .distinct()
+                .orderBy('country', 'asc');
+        } catch (err) {
+            // Return an error if failed to get countries
+            throw new Error(err.message);
+        }
     }
 }
 

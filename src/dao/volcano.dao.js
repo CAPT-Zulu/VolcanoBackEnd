@@ -6,6 +6,8 @@ class VolcanoDAO {
         this.db = db('data');
         // Define valid distances for population radius
         this.validDistances = ['5km', '10km', '30km', '100km'];
+        // Define non restricted fields when user is not authenticated
+        this.nonRestrictedFields = ['id', 'name', 'country', 'region', 'subregion', 'last_eruption', 'summit', 'elevation', 'latitude', 'longitude'];
     }
 
     // Get all volcanoes
@@ -30,7 +32,7 @@ class VolcanoDAO {
             if (!id) throw new Error('Id is a required parameter.');
 
             // Select * if user is authenticated
-            const select = authenticated ? '*' : ['id', 'name', 'country', 'latitude', 'longitude'];
+            const select = authenticated ? '*' : this.nonRestrictedFields;
 
             // Create a query to get volcano by id
             const query = this.db.select(select).where('id', id).first();

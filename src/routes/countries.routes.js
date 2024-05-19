@@ -2,15 +2,26 @@ const express = require('express');
 const router = express.Router();
 const CountryDAO = require('../dao/country.dao');
 
+// Register Route middleware
+router.use((req, res, next) => {
+    // DEBUG
+    console.log('Countries route');
+    // Create a new instance of CountryDAO and attach it to the request object
+    req.countryDAO = new CountryDAO(req.db);
+    next();
+});
+
 // Route for fetching all countries associated with volcanoes
 router.get('/', async function (req, res, next) {
     try {
-        const countryDAO = new CountryDAO(req.db); // Instantiate DAO
-        const countries = await countryDAO.getCountries(); // Fetch countries from the database
+        // Retrieve all countries associated with volcanoes
+        const countries = await req.countryDAO.getCountries();
 
-        res.status(200).json(countries.map(country => country.country)); // Return countries
+        // Return countries with 200 status code
+        res.status(200).json(countries.map(country => country.country));
     } catch (err) {
-        next(err);
+        // Return an error if failed to get countries
+        next(createError(400, err.message));
     }
 });
 
