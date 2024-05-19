@@ -15,15 +15,15 @@ router.use((req, res, next) => {
 // Route for fetching volcanoes by country and optional population radius
 router.get('/', async function (req, res, next) {
     try {
-        // Allowed query parameters
+        // Allowed parameters
         const allowedParameters = ['country', 'populatedWithin'];
-        // Get query parameters
+        // Get parameters
         const { country, populatedWithin } = req.query;
 
         // Check if only allowed parameters are provided
         if (!Object.keys(req.query).every(param => allowedParameters.includes(param))) {
             // Return an error if invalid query parameters are provided
-            return next(createError(400, { message: 'Invalid query parameters. Only country and populatedWithin are permitted.' }));
+            return next(createError(400, 'Invalid query parameters. Only country and populatedWithin are permitted.'));
         }
 
         // Retrieve all volcanoes (Error handling is done in the DAO to abstract the invalid format of the query parameters)
@@ -33,7 +33,7 @@ router.get('/', async function (req, res, next) {
         res.status(200).json(volcanoes);
     } catch (err) {
         // Return an error if failed to get volcanoes by country
-        return next(createError(400, { message: err.message }));
+        return next(createError(400, err.message));
     }
 });
 

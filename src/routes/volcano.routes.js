@@ -1,35 +1,52 @@
 const express = require('express');
 const createError = require('http-errors');
 const router = express.Router();
+const jsonwebtoken = require('jsonwebtoken');
 const VolcanoDAO = require('../dao/volcano.dao');
+
+// Volcano route middleware
+router.use((req, res, next) => {
+    // DEBUG
+    console.log('Volcano route')
+    // Create a new instance of VolcanoDAO and attach it to the request object
+    req.volcanoDAO = new VolcanoDAO(req.db);
+    next();
+});
 
 // Route for getting volcano data by ID
 router.get('/:id', async function (req, res, next) {
     try {
+        // Get volcano ID parameter
         const id = parseInt(req.params.id);
+        // Get token from headers if exists
+        const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+        console.log('Token:', token);
 
-        if (isNaN(id)) {
-            return next(createError(400, 'Invalid volcano ID.'));
+        // Validate token using JWT
+        const user = jsonwebtoken.verify(token, process.env.JWT_SECRET);
+        console.log('User:', user);
+
+
+
+        // Check if ID is a number
+        if (!id && isNaN(id)) {
+            // Next to 404 page
+            return next(createError(404, 'Volcano ID not found.'));
         }
 
-        const volcanoDAO = new VolcanoDAO(req.db); // Instantiate DAO
-        const volcano = await volcanoDAO.getVolcanoById(id); // Fetch volcano by ID
+        // Retrieve volcano by ID
+        const volcano = await req.volcanoDAO.getVolcanoById(id, req.user);
 
+        // Check if volcano exists
         if (!volcano) {
             return next(createError(404, `Volcano with ID: ${id} not found.`));
         }
 
-        // Include population data if the user is authenticated
-        if (req.user) {
-            res.status(200).json(volcano);
-        } else {
-            // Exclude population data for unauthenticated users
-            const { population_5km, population_10km, population_30km, population_100km, ...volcanoWithoutPopulation } = volcano;
-            res.status(200).json(volcanoWithoutPopulation);
-        }
-
+        // Return the volcano with 200 status code
+        res.status(200).json(volcano);
     } catch (err) {
-        next(err);
+        // Return an error if failed to get volcano by ID
+        return next(createError(400, err.message));
     }
 });
 
