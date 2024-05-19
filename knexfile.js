@@ -1,6 +1,6 @@
+// Load environment variables
 const dotenv = require('dotenv');
-const moment = require('moment');
-dotenv.config(); // Load environment variables
+dotenv.config();
 
 module.exports = {
     client: 'mysql2',
