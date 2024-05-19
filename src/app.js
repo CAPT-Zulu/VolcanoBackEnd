@@ -82,3 +82,10 @@ app.listen(process.env.PORT || 3000, () => {
 // });
 
 module.exports = app;
+
+// TODO:
+// - PM2 for server
+// - HTTPS
+// - Custom functions
+// - Swagger docs
+
