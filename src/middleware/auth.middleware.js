@@ -2,30 +2,36 @@ const jwt = require("jsonwebtoken");
 const createError = require("http-errors");
 
 function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
+    try {
+        // Check if the Authorization header is present
+        const authHeader = req.headers['authorization'];
 
-    if (!authHeader) {
-        return next(createError(401, "Authorization header ('Bearer token') not found"));
-    }
-
-    // Expected header format: 'Bearer <token>'
-    const token = authHeader.split(' ')[1];
-
-    if (!token) {
-        return next(createError(401, "Authorization header is malformed"));
-    }
-
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) {
-            if (err.name === 'TokenExpiredError') {
-                return next(createError(401, "JWT token has expired"));
+        if (authHeader) {
+            // Get the token from the Authorization header
+            const token = authHeader.split(' ')[1];
+            if (!token) {
+                return next(createError(401, "Authorization header is malformed"));
             }
-            return next(createError(401, "Invalid JWT token"));
-        }
 
-        req.user = user; // Attach user data to the request object
-        next();
-    });
+            // Verify the token
+            jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+                if (err) {
+                    if (err.name === 'TokenExpiredError') {
+                        return next(createError(401, "JWT token has expired"));
+                    }
+                    return next(createError(401, "Invalid JWT token"));
+                }
+
+                req.user = user; // Attach user data to the request object
+                next();
+            });
+        } else {
+            console.log("No Authorization header found");
+            next();
+        }
+    } catch (err) {
+        next(createError(401, "Unauthorized"));
+    }
 }
 
 module.exports = authenticateToken;

@@ -24,13 +24,16 @@ class VolcanoDAO {
     }
 
     // Get volcano by id
-    async getVolcanoById(id) {
+    async getVolcanoById(id, authenticated = false) {
         try {
             // If id is not provided, throw an error
             if (!id) throw new Error('Id is a required parameter.');
 
+            // Select * if user is authenticated
+            const select = authenticated ? '*' : ['id', 'name', 'country', 'latitude', 'longitude'];
+
             // Create a query to get volcano by id
-            const query = this.db.select('*').where('id', id).first();
+            const query = this.db.select(select).where('id', id).first();
 
             // Await the query, and return the result
             const volcano = await query;

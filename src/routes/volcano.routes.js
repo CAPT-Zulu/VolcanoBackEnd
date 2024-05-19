@@ -2,6 +2,7 @@ const express = require('express');
 const createError = require('http-errors');
 const router = express.Router();
 const jsonwebtoken = require('jsonwebtoken');
+const authenticateToken = require('../middleware/auth.middleware');
 const VolcanoDAO = require('../dao/volcano.dao');
 
 // Volcano route middleware
@@ -14,19 +15,10 @@ router.use((req, res, next) => {
 });
 
 // Route for getting volcano data by ID
-router.get('/:id', async function (req, res, next) {
+router.get('/:id', authenticateToken, async function (req, res, next) {
     try {
         // Get volcano ID parameter
         const id = parseInt(req.params.id);
-        // Get token from headers if exists
-        const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-        console.log('Token:', token);
-
-        // Validate token using JWT
-        const user = jsonwebtoken.verify(token, process.env.JWT_SECRET);
-        console.log('User:', user);
-
-
 
         // Check if ID is a number
         if (!id && isNaN(id)) {
