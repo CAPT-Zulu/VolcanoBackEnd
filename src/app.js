@@ -45,6 +45,8 @@ app.use(express.static(path.join(__dirname, 'public'))); // Serve static files f
 
 
 // --------------------- Routes ---------------------
+// Documentation
+app.get('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Data
 app.use('/countries', countriesRouter); // Countries routes
 app.use('/volcanoes', volcanoesRouter); // Volcanoes routes
@@ -55,10 +57,8 @@ app.use('/user', userRouter); // User routes
 app.use('/profile', authenticateToken, userRouter); // Profile route
 // Administration
 app.use('/me', AdministrationRouter); // Administration route
-// Documentation
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // Swagger docs
-
-app.use(function (req, res, next) { next(createError(404)); }); // 404 error, forwarded to error handler
+// 404 error
+app.use(function (req, res, next) { next(createError(404, 'Not Found')); }); // 404 error, forwarded to error handler
 
 
 // --------------------- Error Handling ---------------------
