@@ -15,22 +15,28 @@ function authenticateToken(req, res, next) {
 
             // Verify the token
             jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+                // If the token is invalid, return an error
                 if (err) {
+                    // Return 401 error if token has expired
                     if (err.name === 'TokenExpiredError') {
                         return next(createError(401, "JWT token has expired"));
                     }
+                    // Return 401 error if token is invalid
                     return next(createError(401, "Invalid JWT token"));
                 }
-
-                req.user = user; // Attach user data to the request object
+                // Attach user data to the request object
+                req.user = user;
+                // Continue to the next middleware
                 next();
             });
         } else {
+            // If no Authorization header is present, continue to the next middleware
             console.log("No Authorization header found");
             next();
         }
     } catch (err) {
-        next(createError(401, "Unauthorized"));
+        // Return 400 error if an error occurred
+        next(createError(400, "An error occurred while authenticating the token"));
     }
 }
 

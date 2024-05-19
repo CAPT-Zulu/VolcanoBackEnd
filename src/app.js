@@ -50,8 +50,7 @@ app.use('/countries', countriesRouter); // Countries routes
 app.use('/volcanoes', volcanoesRouter); // Volcanoes routes
 app.use('/volcano', volcanoRouter); // Volcano routes
 // Authentication
-app.use('/login', userRouter); // Login route
-app.use('/register', userRouter); // Register route
+app.use('/user', userRouter); // User routes
 // Profile
 app.use('/profile', authenticateToken, userRouter); // Profile route
 // Administration
