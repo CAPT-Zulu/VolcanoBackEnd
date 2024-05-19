@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
+// me route
 router.get('/', (req, res) => {
+    // Return owner details saved in .env
     res.json({
-        "name": "YOUR NAME", // Replace with your name
-        "student_number": "YOUR STUDENT NUMBER"  // Replace with your student number
+        "name": process.env.OWNER_NAME,
+        "student_number": process.env.OWNER_NUMBER,
     });
 });
 
