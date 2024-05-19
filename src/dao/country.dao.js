@@ -1,3 +1,5 @@
+import HttpException from '../exceptions/HttpException';
+
 // Country Data Access Object 
 class CountryDAO {
     constructor(db) {
@@ -15,7 +17,7 @@ class CountryDAO {
                 .orderBy('country', 'asc');
         } catch (err) {
             // Return an error if failed to get countries
-            throw new Error(err.message);
+            throw new HttpException(500, 'Failed to get countries');
         }
     }
 }
