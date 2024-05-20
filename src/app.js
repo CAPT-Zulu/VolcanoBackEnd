@@ -84,3 +84,7 @@ module.exports = app;
 // - Custom functions
 // - Custom Swagger docs
 
+// Nginx?
+// sql database dump
+// Server start up auto
+// Port forwarding
