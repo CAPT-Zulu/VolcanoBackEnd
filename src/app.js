@@ -12,7 +12,6 @@ const cors = require('cors');
 const fs = require('fs');
 const https = require('https');
 // Routes
-const docsRouter = require('./routes/docs.routes');
 const countriesRouter = require('./routes/countries.routes');
 const volcanoesRouter = require('./routes/volcanoes.routes');
 const volcanoRouter = require('./routes/volcano.routes');
@@ -75,10 +74,6 @@ app.use(function (err, req, res, next) {
 });
 
 // --------------------- Server ---------------------
-// app.listen(process.env.PORT || 3000, () => {
-//   console.log(`Server is running on port ${process.env.PORT || 3000}`);
-// });
-
 https.createServer(httpsOptions, app).listen(process.env.PORT, () => {
   console.log(`HTTPS Server running on port ${process.env.PORT}`);
 });
@@ -86,7 +81,6 @@ https.createServer(httpsOptions, app).listen(process.env.PORT, () => {
 module.exports = app;
 
 // TODO:
-// - PM2 for server
 // - Custom functions
-// - Swagger docs
+// - Custom Swagger docs
 
