@@ -9,9 +9,10 @@ const helmet = require('helmet');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./docs/swagger.docs.json');
 const cors = require('cors');
-// const fs = require('fs');
-// const https = require('https');
+const fs = require('fs');
+const https = require('https');
 // Routes
+const docsRouter = require('./routes/docs.routes');
 const countriesRouter = require('./routes/countries.routes');
 const volcanoesRouter = require('./routes/volcanoes.routes');
 const volcanoRouter = require('./routes/volcano.routes');
@@ -28,10 +29,10 @@ app.set('views', path.join(__dirname, 'views')); // Set the views directory
 app.set('view engine', 'jade'); // Set the view engine to Jade
 
 // --------------------- HTTPS ---------------------
-// const httpsOptions = {
-//   key: fs.readFileSync('./certificates/key.pem'),
-//   cert: fs.readFileSync('./certificates/cert.pem')
-// };
+const httpsOptions = {
+  key: fs.readFileSync(process.env.PRIVATE_KEY_PATH),
+  cert: fs.readFileSync(process.env.CERTIFICATE_PATH)
+};
 
 // --------------------- Middleware ---------------------
 app.use(dbMiddleware); // Attach Knex instance to the request object
@@ -46,7 +47,8 @@ app.use(express.static(path.join(__dirname, 'public'))); // Serve static files f
 
 // --------------------- Routes ---------------------
 // Swagger Docs
-app.get('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.get('/', (req, res) => { res.redirect('/docs') }); // Redirect to docs (Not sure what else to do here)
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // Docs route
 // Data API
 app.use('/countries', countriesRouter); // Countries routes
 app.use('/volcanoes', volcanoesRouter); // Volcanoes routes
@@ -73,19 +75,18 @@ app.use(function (err, req, res, next) {
 });
 
 // --------------------- Server ---------------------
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`Server is running on port ${process.env.PORT || 3000}`);
-});
-
-// https.createServer(httpsOptions, app).listen(3443, () => {
-//   console.log('HTTPS Server running on port 3443');
+// app.listen(process.env.PORT || 3000, () => {
+//   console.log(`Server is running on port ${process.env.PORT || 3000}`);
 // });
+
+https.createServer(httpsOptions, app).listen(process.env.PORT, () => {
+  console.log(`HTTPS Server running on port ${process.env.PORT}`);
+});
 
 module.exports = app;
 
 // TODO:
 // - PM2 for server
-// - HTTPS
 // - Custom functions
 // - Swagger docs
 
