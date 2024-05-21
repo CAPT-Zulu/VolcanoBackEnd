@@ -59,7 +59,7 @@ router.get("/:email/profile", authenticateToken, async (req, res, next) => {
     // Get user email
     const userEmail = req.params.email;
 
-    // Attempt to retrieve profile by email
+    // Attempt to retrieve profile by email (pass in the authenticated user to check if they are authorized to view the profile)
     const profile = await req.userDAO.getProfile(userEmail, req.user);
 
     // Return profile with 200 status code

@@ -46,8 +46,8 @@ app.use(express.static(path.join(__dirname, 'public'))); // Serve static files f
 
 // --------------------- Routes ---------------------
 // Swagger Docs
-app.get('/', (req, res) => { res.redirect('/docs') }); // Redirect to docs (Not sure what else to do here)
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // Docs route
+app.use('/', swaggerUi.serve)
+app.get('/', swaggerUi.setup(swaggerDocument)); // Docs route
 // Data API
 app.use('/countries', countriesRouter); // Countries routes
 app.use('/volcanoes', volcanoesRouter); // Volcanoes routes
