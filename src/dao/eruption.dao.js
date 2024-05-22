@@ -4,7 +4,7 @@ const HttpException = require('../exceptions/HttpException');
 class EruptionDAO extends VolcanoDAO {
     constructor(db, authenticated = false) {
         super(db, authenticated);
-        this.db = db('eruptions');
+        this.db = db('eruption_guesses');
     }
 
     // Set the guess year for a volcano eruption

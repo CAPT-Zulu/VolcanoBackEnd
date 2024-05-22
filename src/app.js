@@ -108,11 +108,13 @@ https.createServer(httpsOptions, app).listen(process.env.PORT, () => {
 module.exports = app;
 
 // TODO:
-// - Custom functions
-// - Custom Swagger docs
+// - Finish custom functions
+// - Finish custom Swagger docs
 
 // sql database dump
 // Server start up auto
 // Port forwarding
 // Cookie parser, do I need it?
 // Route HTTP to HTTPS?
+// I want to abstract the different routes into related folders or connect them to higher level routes
+// Same with the DAOs should I use controllers which call the DAOs?
