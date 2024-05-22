@@ -11,7 +11,7 @@ router.use((req, res, next) => {
 });
 
 // Route for fetching all countries associated with volcanoes
-router.get('/', async function (req, res, next) {
+router.get('/', async (req, res, next) => {
     try {
         // Retrieve all countries associated with volcanoes
         const countries = await req.countryDAO.getCountries();

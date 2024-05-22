@@ -1,17 +1,17 @@
+const VolcanoDAO = require('./volcano.dao');
 const HttpException = require('../exceptions/HttpException');
 
 // Country Data Access Object 
-class CountryDAO {
+class CountryDAO extends VolcanoDAO {
     constructor(db) {
-        // Attach the Knex instance to the DAO
-        this.db = db;
+        super(db, false);
     }
 
     // Get a list of all countries associated with volcanoes
     getCountries() {
         try {
             // Return a list of all countries associated with volcanoes
-            return this.db('data')
+            return this.db
                 .select('country')
                 .distinct()
                 .orderBy('country', 'asc');

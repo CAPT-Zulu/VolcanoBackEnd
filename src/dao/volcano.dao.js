@@ -3,26 +3,23 @@ const HttpException = require('../exceptions/HttpException');
 // Volcano Data Access Object
 class VolcanoDAO {
     // Constructor with a db object
-    constructor(db) {
+    constructor(db, authenticated = false) {
         // Assign the db object to the class
         this.db = db('data');
         // Define valid distances for population radius
         this.validDistances = ['5km', '10km', '30km', '100km'];
-        // Define non restricted fields when user is not authenticated
-        this.nonAuthFields = ['id', 'name', 'country', 'region', 'subregion', 'last_eruption', 'summit', 'elevation', 'latitude', 'longitude'];
+        // Define fields that are not restricted
+        this.nonAuthFields = authenticated ? '*' : ['id', 'name', 'country', 'region', 'subregion', 'last_eruption', 'summit', 'elevation', 'latitude', 'longitude'];
     }
 
     // Get volcano by id
-    async getVolcanoById(id, authenticated = false) {
+    async getVolcanoById(id) {
         try {
             // If id is not provided, throw an error
             if (!id) throw new HttpException(404, 'Volcano ID not found.');
 
-            // Select * if user is authenticated, otherwise select nonAuthFields
-            const select = authenticated ? '*' : this.nonAuthFields;
-
             // Retrieve the volcano by id
-            const volcano = await this.db.select(select)
+            const volcano = await this.db.select(this.nonAuthFields)
                 .where('id', id)
                 .first();
 
@@ -37,14 +34,14 @@ class VolcanoDAO {
         }
     }
 
-    // Get volcanoes by country
+    // Get volcanoes by country and optional population
     async getVolcanoesByCountry(country, population) {
         try {
             // If country is not provided, throw an error
             if (!country) throw new HttpException(400, 'Country is a required query parameter.');
 
             // Create a query to get volcanoes by country
-            const query = this.db.select('*')
+            const query = this.db.select(this.nonAuthFields)
                 .where('country', country);
 
             // If population is provided
@@ -63,6 +60,55 @@ class VolcanoDAO {
         } catch (err) {
             // Throw an error if failed to retrieve volcanoes by country
             throw new HttpException(err.status || 500, err.message || 'Failed to get volcanoes by country');
+        }
+    }
+
+    // Get a random volcano
+    async getRandomVolcano() {
+        try {
+            // Get the total number of volcanoes
+            const totalVolcanoes = await this.db.count('id').first();
+
+            // If no volcanoes are found, return an error
+            if (!totalVolcanoes) throw new HttpException(404, 'No volcanoes found.');
+
+            // Generate a random number between 1 and the total number of volcanoes
+            const random = Math.floor(Math.random() * totalVolcanoes.count) + 1;
+
+            // Retrieve a random volcano
+            const randomVolcano = await this.db.select(this.nonAuthFields)
+                .where('id', random)
+                .first();
+
+            // If no random volcano is found, return an error
+            if (!randomVolcano) throw new HttpException(404, 'No random volcano found.');
+
+            // Return the random volcano
+            return randomVolcano;
+        } catch (err) {
+            // Throw an error if failed to retrieve a random volcano
+            throw new HttpException(err.status || 500, err.message || 'Failed to get random volcano');
+        }
+    }
+
+    // Get volcanoes in a list of ids
+    async getVolcanoesInList(ids) {
+        try {
+            // If ids are not provided, throw an error
+            if (!ids) throw new HttpException(400, 'Volcano IDs are required.');
+
+            // Retrieve the volcanoes in the list of ids
+            const volcanoes = await this.db.select(this.nonAuthFields)
+                .whereIn('id', ids);
+
+            // If no volcanoes are found, return an error
+            if (!volcanoes.length) throw new HttpException(404, 'No volcanoes found.');
+
+            // Return the volcanoes
+            return volcanoes;
+        } catch (err) {
+            // Throw an error if failed to retrieve volcanoes in list
+            throw new HttpException(err.status || 500, err.message || 'Failed to get volcanoes in list');
         }
     }
 }
