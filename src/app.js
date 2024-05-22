@@ -85,9 +85,18 @@ app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // Render the error page (or send JSON response for API errors)
-  res.status(err.status || 500);
-  res.json({ error: true, message: err.message })
+  // If the error is an 500 internal server error, render custom error page
+  if (err.status === 500) {
+    // Log the error
+    console.error(err);
+    // Send JSON response for API errors
+    res.status(500);
+    res.json({ error: true, message: 'Internal server error' }); // Don't send the error message to the client may contain sensitive information
+  } else {
+    // Render the error page
+    res.status(err.status || 500);
+    res.json({ error: true, message: err.message })
+  }
 });
 
 

@@ -948,187 +948,67 @@
         }
       }
     },
-    "/volcanoes/{volcanoId}/save": {
-      "post": {
+    "/volcanoes/random": {
+      "get": {
         "tags": [
-          "Saved Volcanoes"
+          "Data"
         ],
-        "description": "Saves a volcano to the authenticated user's saved list.",
-        "parameters": [
-          {
-            "name": "volcanoId",
-            "in": "path",
-            "description": "ID of the volcano to save",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Volcano successfully saved.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano saved"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request. Missing required parameters.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano ID and user email are required parameters"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized. User is not authenticated.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MissingAuthHeader"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Volcano not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano with ID 123 not found"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict. Volcano is already saved by the user.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano with ID 123 is already saved by user test@example.com"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Saved Volcanoes"
-        ],
-        "description": "Removes a volcano from the authenticated user's saved list.",
-        "parameters": [
-          {
-            "name": "volcanoId",
-            "in": "path",
-            "description": "ID of the volcano to remove",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+        "description": "Returns a random volcano from the database.",
         "responses": {
           "200": {
-            "description": "Volcano successfully removed.",
+            "description": "Returns a random volcano. An example of the object is shown below.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano removed from saved list"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request. Missing required parameters.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
+                    "id": {
+                      "type": "number",
+                      "example": 10
                     },
-                    "message": {
+                    "name": {
                       "type": "string",
-                      "example": "Volcano ID and user email are required parameters"
+                      "example": "Akita-Komaga-take"
+                    },
+                    "country": {
+                      "type": "string",
+                      "example": "Japan"
+                    },
+                    "region": {
+                      "type": "string",
+                      "example": "Japan, Taiwan, Marianas"
+                    },
+                    "subregion": {
+                      "type": "string",
+                      "example": "Honshu"
+                    },
+                    "last_eruption": {
+                      "type": "string",
+                      "example": "Unknown"
+                    },
+                    "summit": {
+                      "type": "number",
+                      "example": "1637"
+                    },
+                    "elevation": {
+                      "type": "number",
+                      "example": "5369"
+                    },
+                    "latitude": {
+                      "type": "string",
+                      "example": "39.8333"
+                    },
+                    "longitude": {
+                      "type": "string",
+                      "example": "140.8333"
                     }
                   }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized. User is not authenticated.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MissingAuthHeader"
                 }
               }
             }
           },
           "404": {
-            "description": "Volcano not found.",
+            "description": "No volcanoes found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1140,7 +1020,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Volcano with ID 123 not found"
+                      "example": "No volcanoes found."
                     }
                   }
                 }
@@ -1150,12 +1030,23 @@
         }
       }
     },
-    "/volcanoes/saved": {
+    "/user/{email}/favorites": {
       "get": {
         "tags": [
-          "Saved Volcanoes"
+          "Favorites"
         ],
-        "description": "Retrieves all volcanoes saved by the authenticated user.",
+        "description": "Returns a list of volcanoes that have been saved to the favorites of the user with the provided email. The email path parameter is required and must be an email that has been registered. This route also requires the user to be authenticated. To be authenticated, a valid JWT token must be sent in the header of the request. To test this using Swagger, click the green 'Authorize' button at the top of this page to enter your JWT token. A JWT token can be obtained by logging in.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "Email address of a registered user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1163,7 +1054,7 @@
         ],
         "responses": {
           "200": {
-            "description": "List of saved volcanoes.",
+            "description": "An array of favorite volcanoes. An example of the object is shown below.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1172,24 +1063,60 @@
                     "type": "object",
                     "properties": {
                       "id": {
-                        "type": "integer",
-                        "example": 123
+                        "type": "number",
+                        "example": 1
                       },
                       "name": {
                         "type": "string",
-                        "example": "Example Volcano"
+                        "example": "Abu"
                       },
                       "country": {
                         "type": "string",
-                        "example": "Example Country"
+                        "example": "Japan"
                       },
                       "region": {
                         "type": "string",
-                        "example": "Example Region"
+                        "example": "Japan, Taiwan, Marianas"
                       },
                       "subregion": {
                         "type": "string",
-                        "example": "Example Subregion"
+                        "example": "Honshu"
+                      },
+                      "last_eruption": {
+                        "type": "string",
+                        "example": "6850 BCE"
+                      },
+                      "summit": {
+                        "type": "number",
+                        "example": "641"
+                      },
+                      "elevation": {
+                        "type": "number",
+                        "example": "2103"
+                      },
+                      "latitude": {
+                        "type": "string",
+                        "example": "34.5000"
+                      },
+                      "longitude": {
+                        "type": "string",
+                        "example": "131.6000"
+                      },
+                      "population_5km": {
+                        "type": "number",
+                        "example": "3597"
+                      },
+                      "population_10km": {
+                        "type": "number",
+                        "example": "9594"
+                      },
+                      "population_30km": {
+                        "type": "number",
+                        "example": "117805"
+                      },
+                      "population_100km": {
+                        "type": "number",
+                        "example": "4071152"
                       }
                     }
                   }
@@ -1198,7 +1125,7 @@
             }
           },
           "400": {
-            "description": "Bad Request. Missing required parameters.",
+            "description": "Missing user email",
             "content": {
               "application/json": {
                 "schema": {
@@ -1218,11 +1145,313 @@
             }
           },
           "401": {
-            "description": "Unauthorized. User is not authenticated.",
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MissingAuthHeader"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MissingAuthHeader"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenExpired"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidJWT"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MalformedAuthHeader"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No favorites found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No favorites found for user example@example.com"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Favorites"
+        ],
+        "description": "Saves a volcano to the favorites of the currently authenticated user. The volcano ID must be provided in the request body. This route requires the user to be authenticated. To be authenticated, a valid JWT token must be sent in the header of the request. To test this using Swagger, click the green 'Authorize' button at the top of this page to enter your JWT token. A JWT token can be obtained by logging in.",
+        "requestBody": {
+          "description": "The ID of the volcano to save.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "volcanoID": {
+                    "type": "integer",
+                    "example": 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "Email address of a registered user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Volcano saved to favorites",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 10 saved to favorites"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID or user email. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Volcano ID and user email are required parameters"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Volcano ID is a required parameter"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MissingAuthHeader"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenExpired"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidJWT"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MalformedAuthHeader"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Volcano not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 10 not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Volcano already saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 10 is already saved by user example@example.com"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Favorites"
+        ],
+        "description": "Removes a volcano from the favorites of the currently authenticated user. The volcano ID must be provided as a path parameter. This route requires the user to be authenticated. To be authenticated, a valid JWT token must be sent in the header of the request. To test this using Swagger, click the green 'Authorize' button at the top of this page to enter your JWT token. A JWT token can be obtained by logging in.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano to remove from favorites",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "email",
+            "in": "path",
+            "description": "Email address of a registered user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Volcano removed from favorites",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 10 removed from favorites"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano ID is a required parameter"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MissingAuthHeader"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenExpired"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidJWT"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MalformedAuthHeader"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Volcano not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 10 not found"
+                    }
+                  }
                 }
               }
             }
@@ -1230,15 +1459,93 @@
         }
       }
     },
-    "/volcano/{volcanoId}/images": {
-      "post": {
+    "/volcano/{volcanoID}/eruption": {
+      "get": {
         "tags": [
-          "Volcano Images"
+          "Eruption Guesses"
         ],
-        "description": "Posts an image for a specific volcano. Requires authentication.",
+        "description": "Returns a list of all eruption year guesses for a volcano, specified by its ID in the path parameter. The volcano ID is required.",
         "parameters": [
           {
-            "name": "volcanoId",
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of eruption year guesses. An example of the array is shown below.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "eruptionYear": {
+                        "type": "integer",
+                        "example": 2024
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano ID is a required parameter"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No eruption guesses found for volcano",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No eruption guesses found for volcano with ID 1"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Eruption Guesses"
+        ],
+        "description": "Submits an eruption year guess for a specific volcano, specified by its ID in the path parameter. The volcano ID and the guess year (in the request body) are required. This route requires the user to be authenticated - a valid JWT token must be sent in the header of the request. To test this using Swagger, click the green 'Authorize' button at the top of this page to enter your JWT token. A JWT token can be obtained by logging in.",
+        "parameters": [
+          {
+            "name": "volcanoID",
             "in": "path",
             "description": "ID of the volcano",
             "required": true,
@@ -1248,7 +1555,207 @@
           }
         ],
         "requestBody": {
-          "description": "Image URL to be posted.",
+          "description": "The eruption year guess.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "guessYear": {
+                    "type": "integer",
+                    "example": 2024
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Eruption year guess submitted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Eruption year guess 2024 submitted for volcano with ID 1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID or guess year",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano ID and eruption year are required parameters"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MissingAuthHeader"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenExpired"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidJWT"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MalformedAuthHeader"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Volcano not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 1 not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/volcano/{volcanoID}/image": {
+      "get": {
+        "tags": [
+          "Images"
+        ],
+        "description": "Returns a list of image URLs for a specific volcano, identified by its ID in the path parameter. The volcano ID is required.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of image URLs. An example of the first element in the array is shown below.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "imageUrl": {
+                        "type": "string",
+                        "example": "https://example.com/image.jpg"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano ID is a required parameter"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No images found for volcano",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "No images found for volcano with ID 1"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Images"
+        ],
+        "description": "Uploads an image for a volcano, specified by ID in the path parameter. Requires authentication (JWT token) and the image URL in the request body.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The URL of the image to upload.",
           "required": true,
           "content": {
             "application/json": {
@@ -1271,7 +1778,7 @@
         ],
         "responses": {
           "201": {
-            "description": "Image successfully posted.",
+            "description": "Image uploaded successfully.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1287,7 +1794,7 @@
             }
           },
           "400": {
-            "description": "Bad Request. Missing required parameters.",
+            "description": "Missing volcano ID or image URL",
             "content": {
               "application/json": {
                 "schema": {
@@ -1307,17 +1814,30 @@
             }
           },
           "401": {
-            "description": "Unauthorized. User is not authenticated.",
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MissingAuthHeader"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MissingAuthHeader"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenExpired"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidJWT"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MalformedAuthHeader"
+                    }
+                  ]
                 }
               }
             }
           },
           "404": {
-            "description": "Volcano not found.",
+            "description": "Volcano not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1329,7 +1849,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Volcano with ID 123 not found"
+                      "example": "Volcano with ID 1 not found"
                     }
                   }
                 }
@@ -1338,106 +1858,14 @@
           }
         }
       },
-      "get": {
+      "delete": {
         "tags": [
-          "Volcano Images"
+          "Images"
         ],
-        "description": "Gets all images for a specific volcano.",
+        "description": "Flags an image for removal, specified by its ID. Requires authentication (JWT token). If an image receives three flags, it will be automatically deleted from the database.",
         "parameters": [
           {
-            "name": "volcanoId",
-            "in": "path",
-            "description": "ID of the volcano",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of images for the specified volcano.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "example": 456
-                      },
-                      "image_url": {
-                        "type": "string",
-                        "example": "https://example.com/image.jpg"
-                      },
-                      "posted_by": {
-                        "type": "string",
-                        "example": "test@example.com"
-                      },
-                      "reports": {
-                        "type": "integer",
-                        "example": 0
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request. Missing required parameters.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano ID is a required parameter"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Volcano not found.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano with ID 123 not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/volcano/{volcanoId}/images/{imageId}/reports": {
-      "post": {
-        "tags": [
-          "Volcano Images"
-        ],
-        "description": "Posts a report for a specific volcano image. Requires authentication.",
-        "parameters": [
-          {
-            "name": "volcanoId",
+            "name": "volcanoID",
             "in": "path",
             "description": "ID of the volcano",
             "required": true,
@@ -1446,7 +1874,7 @@
             }
           },
           {
-            "name": "imageId",
+            "name": "imageID",
             "in": "path",
             "description": "ID of the image",
             "required": true,
@@ -1459,7 +1887,95 @@
           {
             "bearerAuth": []
           }
-        ]
+        ],
+        "responses": {
+          "204": {
+            "description": "Image flagged successfully (No Content)."
+          },
+          "400": {
+            "description": "Missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano ID, image ID, and reporter email are required parameters"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MissingAuthHeader"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenExpired"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidJWT"
+                    },
+                    {
+                      "$ref": "#/components/schemas/MalformedAuthHeader"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Image not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Image with ID 1 for volcano with ID 1 not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User already reported this image",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User example@example.com has already reported image with ID 1"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

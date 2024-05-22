@@ -1,6 +1,6 @@
 const express = require("express");
 const createError = require('http-errors');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const UserDAO = require("../dao/user.dao");
 
 // Profile Route middleware

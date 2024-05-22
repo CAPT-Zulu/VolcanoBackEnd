@@ -1,6 +1,6 @@
 const express = require('express');
 const createError = require('http-errors');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const ImageDAO = require('../dao/image.dao');
 
 // Volcano route middleware
