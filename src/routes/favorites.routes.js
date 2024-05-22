@@ -34,7 +34,7 @@ router.post('/', async (req, res, next) => {
 });
 
 // Remove Saved Volcano Route
-router.delete("/:volcanoID/save", authenticateToken, async (req, res, next) => {
+router.delete("/:volcanoID/save", async (req, res, next) => {
     try {
         // Check if user is authenticated
         if (req.user) {
@@ -55,3 +55,5 @@ router.delete("/:volcanoID/save", authenticateToken, async (req, res, next) => {
         next(createError(err.status || 500, err.message || 'Failed to remove saved volcano'));
     }
 });
+
+module.exports = router;

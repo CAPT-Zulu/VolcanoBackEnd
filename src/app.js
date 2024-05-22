@@ -61,16 +61,16 @@ app.use('/countries', countriesRouter); // Countries routes
 app.use('/volcanoes', volcanoesRouter); // Volcanoes routes
 app.use('/volcano/:id', volcanoRouter); // Volcano routes
 // Image API
-app.use('/volcano/:id/image', imageRouter); // Image routes (get images, put images, delete images, post report)
+app.use('/volcano/:id/image', imageRouter); // Image routes
 // Eruption guesses API
-app.use('/volcano/:id/eruption', eruptionRouter); // Eruption routes (get, put)
+app.use('/volcano/:id/eruption', eruptionRouter); // Eruption routes
 
 // Authentication API
 app.use('/user', userRouter); // User routes
 // Profile API
 app.use('/user/:email/profile', profileRouter); // Profile route
 // Favorites API
-app.use('/user/:email/favorites', favoritesRouter); // Favorites route (get, post, delete)
+app.use('/user/:email/favorites', favoritesRouter); // Favorites route 
 
 // Administration API
 app.use('/me', AdministrationRouter); // Administration route

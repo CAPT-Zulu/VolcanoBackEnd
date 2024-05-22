@@ -76,3 +76,5 @@ router.post("/report", async (req, res, next) => {
         next(createError(err.status || 500, err.message || 'Failed to submit report'));
     }
 });
+
+module.exports = router;

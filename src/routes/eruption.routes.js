@@ -50,3 +50,5 @@ router.post('/', async (req, res, next) => {
         next(createError(err.status || 500, err.message || 'Failed to submit eruption year guess'));
     }
 });
+
+module.exports = router;
