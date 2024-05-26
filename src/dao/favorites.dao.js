@@ -12,25 +12,24 @@ class FavoritesDAO {
     }
 
     // Add a favorite to the database
-    async addFavorite(volcanoID, userEmail) {
+    async addFavorite(volcanoID) {
         try {
             // Check if volcano ID and user email are provided
-            if (!volcanoID || !userEmail) throw new HttpException(400, 'Volcano ID and user email are required parameters');
+            if (!volcanoID) throw new HttpException(400, 'Volcano ID is an required parameter');
+
+            // Check if user is authenticated
+            if (!this.authenticated.email) throw new HttpException(401, 'Unauthorized');
 
             // Check if the volcano exists
-            const volcanoExists = await this.getVolcanoById(volcanoID);
-
-            // Return an error if the volcano does not exist
+            const volcanoExists = await this.volcanoDAO.getVolcanoById(volcanoID);
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoID} not found`);
 
             // Check if the volcano is already saved by the user
-            const alreadySaved = await this.db.where({ volcanoID, userEmail }).first();
-
-            // Return an error if the volcano is already saved by the user
-            if (alreadySaved) throw new HttpException(409, `Volcano with ID ${volcanoID} is already saved by user ${userEmail}`);
+            const alreadySaved = await this.db.where({ volcanoID, userEmail: this.authenticated.email }).first();
+            if (alreadySaved) throw new HttpException(409, `Volcano with ID ${volcanoID} is already saved by user ${this.authenticated.email}`);
 
             // Save the volcano to the user's saved list
-            return this.db.insert({ volcanoID, userEmail });
+            return this.db.insert({ volcanoID, userEmail: this.authenticated.email });
         } catch (err) {
             // Return an error if failed to save volcano
             throw new HttpException(err.status || 500, err.message || 'Failed to save volcano');
@@ -66,14 +65,15 @@ class FavoritesDAO {
             // Check if volcano ID is provided
             if (!volcanoID) throw new HttpException(400, 'Volcano ID is a required parameter');
 
+            // Check if user is authenticated
+            if (!this.authenticated.email) throw new HttpException(401, 'Unauthorized');
+
             // Check if the volcano exists
             const volcanoExists = await this.getVolcanoById(volcanoID);
-
-            // Return an error if the volcano does not exist
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoID} not found`);
 
             // Delete the saved volcano
-            return this.db.where({ volcanoID }).del();
+            return this.db.where({ volcanoID, userEmail: this.authenticated.email }).del();
         } catch (err) {
             // Return an error if failed to delete favorite
             throw new HttpException(err.status || 500, err.message || 'Failed to delete favorite');
