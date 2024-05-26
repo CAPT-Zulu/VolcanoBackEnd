@@ -1,6 +1,5 @@
 const HttpException = require('../exceptions/HttpException');
 const bcrypt = require('bcrypt');
-// const moment = require('moment');
 
 // User Data Access Object
 class UserDAO {
