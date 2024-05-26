@@ -18,6 +18,9 @@ class commentDAO extends VolcanoDAO {
             // Check if comment is provided
             if (!comment) throw new HttpException(400, 'The comment is a required parameter');
 
+            // Check if comment is too long (255 characters max)
+            if (comment.length > 255) throw new HttpException(400, 'Comment is too long (255 characters max)');
+
             // Check if comment is inappropriate or harmful
             const filter = new badWords();
             filter.addWords('Test_bad_word_and_or_inappropriate_content') // Test bad word to be used for testing
