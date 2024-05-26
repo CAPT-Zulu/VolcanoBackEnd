@@ -4,10 +4,13 @@ const authenticateToken = require('../../middleware/auth.middleware');
 const UserDAO = require("../../dao/user.dao");
 const jwt = require("jsonwebtoken");
 
+// Authenticate token middleware
+router.use(authenticateToken); // Isn't used with the /register and /login routes but made it neater to include it here
+
 // User route middleware
 router.use((req, res, next) => {
   // Create a new instance of UserDAO and attach it to the request object
-  req.userDAO = new UserDAO(req.db);
+  req.userDAO = new UserDAO(req.db, req.user);
   next();
 });
 
@@ -53,9 +56,9 @@ router.post("/login", async (req, res, next) => {
 });
 
 // Profile Router
-router.use("/:email/profile", authenticateToken, require("./profile"));
+router.use("/:email/profile", require("./profile"));
 
 // Favorites Router
-router.use("/:email/favorites", authenticateToken, require("./favorites"));
+router.use("/:email/favorites", require("./favorites"));
 
 module.exports = router;

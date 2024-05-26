@@ -8,7 +8,7 @@ class VolcanoDAO {
         this.db = db('data');
         // Define valid distances for population radius
         this.validDistances = ['5km', '10km', '30km', '100km'];
-        // Define fields that are not restricted
+        // Define fields that are not accessible to non-authenticated users
         this.nonAuthFields = authenticated ? '*' : ['id', 'name', 'country', 'region', 'subregion', 'last_eruption', 'summit', 'elevation', 'latitude', 'longitude'];
     }
 

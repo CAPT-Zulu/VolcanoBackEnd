@@ -4,16 +4,14 @@ const bcrypt = require('bcrypt');
 
 // User Data Access Object
 class UserDAO {
-    constructor(db) {
+    constructor(db, authenticated = false) {
         // Attach the Knex instance to the DAO
         this.db = db;
-        // Define non restricted fields when user is authenticated
-        this.authFields = ['email', 'firstName', 'lastName', 'dob', 'address'];
-        // Define non restricted fields when user is not authenticated
-        this.nonAuthFields = ['email', 'firstName', 'lastName'];
+        // Define fields that are not accessible to non-authenticated users
+        this.nonAuthFields = authenticated ? ['email', 'firstName', 'lastName', 'dob', 'address'] : ['email', 'firstName', 'lastName'];
     }
 
-    // Find a user by their email (Private)
+    // Find a user by their email (Private, only used within the DAO for obvious reasons)
     async findUserByEmail(email) {
         try {
             // Return the user with the provided email
@@ -78,25 +76,22 @@ class UserDAO {
     }
 
     // Get user profile by email
-    async getProfile(email, authenticated) {
+    async getProfile(email) {
         try {
             // Check if email is provided
             if (!email) throw new Error('Email is a required parameter');
 
-            // Check if authenticated user is requesting their own profile
-            const select = authenticated && email === authenticated.email ? this.authFields : this.nonAuthFields;
+            // Check user is authenticated
+            if (!this.authenticated) throw new HttpException(401, 'Unauthorized');
 
             // Retrieve the user profile by email
             const profile = await this.db('users')
-                .select(select)
+                .select(this.nonAuthFields) // User's should not be able to swap user accounts mid-request, so this should be fine.
                 .where({ email })
                 .first();
 
             // Check if profile exists
             if (!profile) throw new HttpException(404, 'User not found');
-
-            // Fix the date on dob (Otherwise it will be returned as a timestamp)
-            // if (profile.dob) profile.dob = moment(profile.dob).format('YYYY-MM-DD');
 
             // Fix the date on dob (Otherwise it will be returned as a timestamp)
             if (profile.dob) profile.dob = new Date(profile.dob).toISOString().split('T')[0];
@@ -110,7 +105,7 @@ class UserDAO {
     }
 
     // Update user profile
-    async updateProfile(email, profile, authenticated) {
+    async updateProfile(email, profile) {
         try {
             // Set body fields
             const { firstName, lastName, address, dob } = profile;
@@ -128,8 +123,8 @@ class UserDAO {
                 throw new HttpException(400, 'Request body invalid: firstName, lastName and address must be strings only.');
             }
             // Check if authenticated user is updating their own profile
-            if (!authenticated || email !== authenticated.email) {
-                throw new HttpException(403, 'Unauthorized');
+            if (!this.authenticated || email !== this.authenticated.email) {
+                throw new HttpException(401, 'Unauthorized');
             }
             // Check if dob is a valid date !/^\d{4}-\d{2}-\d{2}$/.test(dob) || 
             if (isNaN(new Date(dob)) || dob !== new Date(dob).toISOString().split('T')[0]) {
@@ -142,7 +137,7 @@ class UserDAO {
 
             // Update the user profile with the provided email
             return this.db('users')
-                .select(this.restrictedFields)
+                .select(this.nonAuthFields)
                 .where({ email })
                 .update(profile);
         } catch (err) {

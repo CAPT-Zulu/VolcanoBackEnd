@@ -3,11 +3,11 @@ const HttpException = require('../exceptions/HttpException');
 const badWords = require('bad-words');
 
 // comment Data Access Object
-class commentDAO extends VolcanoDAO {
+class commentDAO {
     constructor(db, authenticated = false) {
-        super(db, authenticated); // Initialize the parent class
         this.db = db('comments'); // Set the table for the DAO
         this.reports_db = db('comment_reports'); // Set the table for comment reports
+        this.volcanoDAO = new VolcanoDAO(db, authenticated); // Create a new instance of the VolcanoDAO
     }
 
     // Verify the comment
@@ -42,12 +42,8 @@ class commentDAO extends VolcanoDAO {
             if (!userEmail) throw new HttpException(401, 'Unauthorized');
 
             // Check if the volcano exists
-            const volcanoExists = await this.db('volcanoes').where({ id: volcanoId }).first();
+            const volcanoExists = await this.volcanoDAO.getVolcanoById(volcanoId);
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoId} not found`);
-
-            // Check if user is valid
-            const user = await this.db('users').where({ email: userEmail }).first();
-            if (!user) throw new HttpException(401, 'Unauthorized');
 
             // Verify the comment (Attempt to prevent inappropriate or harmful comments)
             await this.verifyComment(comment);
@@ -55,10 +51,11 @@ class commentDAO extends VolcanoDAO {
             // Attempt to save the comment
             const commentID = await this.db.insert({ volcanoId, userEmail, comment });
 
-            console.log(commentID);
+            // Check if the commentID was returned
+            if (!commentID[0]) throw new HttpException(500, 'Failed to save comment');
 
             // Return the comment ID
-            return commentID;
+            return commentID[0];
         } catch (err) {
             // Return an error if failed to save comment
             throw new HttpException(err.status || 500, err.message || 'Failed to save comment');
@@ -73,7 +70,7 @@ class commentDAO extends VolcanoDAO {
             if (!userEmail) throw new HttpException(401, 'Unauthorized');
 
             // Check if the comment exists
-            const commentExists = await this.db.where({ id: commentId }).first();
+            const commentExists = await this.db.where({ commentId }).first();
             if (!commentExists) throw new HttpException(404, `Comment with ID ${commentId} not found`);
 
             // Check if user is the author of the comment
@@ -83,7 +80,7 @@ class commentDAO extends VolcanoDAO {
             await this.verifyComment(comment);
 
             // Attempt to update the comment
-            await this.db.where({ id: commentId }).update({ comment });
+            await this.db.where({ commentId }).update({ comment });
 
             // Return success
             return true;
@@ -100,14 +97,14 @@ class commentDAO extends VolcanoDAO {
             if (!commentId) throw new HttpException(400, 'The comment ID is a required parameter');
 
             // Check if the comment exists
-            const commentExists = await this.db.where({ id: commentId }).first();
+            const commentExists = await this.db.where({ commentId }).first();
             if (!commentExists) throw new HttpException(404, `Comment with ID ${commentId} not found`);
 
             // Check if user is the author of the comment
             if (commentExists.userEmail !== userEmail) throw new HttpException(403, 'User is not the author of the comment');
 
             // Attempt to delete the comment
-            await this.db.where({ id: commentId }).del();
+            await this.db.where({ commentId }).del();
 
             // Return success
             return true;
@@ -123,8 +120,12 @@ class commentDAO extends VolcanoDAO {
             // Check if volcano ID is provided
             if (!volcanoId) throw new HttpException(400, 'Volcano ID is a required parameter');
 
+            // Check if the volcano exists
+            const volcanoExists = await this.volcanoDAO.getVolcanoById(volcanoId);
+            if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoId} not found`);
+
             // Get the comments for the volcano
-            const comments = await this.db.select('commentUrl').where({ volcanoId }); // Add a limit to the number of comments returned
+            const comments = await this.db.select('commentId').where({ volcanoId }); // Add a limit to the number of comments returned
 
             // Return an error if no comments are found
             if (!comments.length) throw new HttpException(404, `No comments found for volcano with ID ${volcanoId}`);
@@ -138,16 +139,16 @@ class commentDAO extends VolcanoDAO {
     }
 
     // Post a report for a volcano comment (Checking if the comment has been reported 3 times, if so, delete the comment)
-    async postReport(volcanoId, commentId, reporterEmail) {
+    async postReport(commentId, reporterEmail) {
         try {
-            // Check if volcano ID, comment ID, and reporter email are provided
-            if (!volcanoId || !commentId || !reporterEmail) throw new HttpException(400, 'Volcano ID and comment ID are required parameters');
+            // Check if volcano ID and reporter email are provided
+            if (!commentId) throw new HttpException(400, 'comment ID is an required parameter');
             // Check if user email is provided
             if (!reporterEmail) throw new HttpException(401, 'Unauthorized');
 
             // Check if the comment exists
-            const commentExists = await this.where({ id: commentId, volcanoId }).first();
-            if (!commentExists) throw new HttpException(404, `comment with ID ${commentId} for volcano with ID ${volcanoId} not found`);
+            const commentExists = await this.where({ commentId }).first();
+            if (!commentExists) throw new HttpException(404, `comment with ID ${commentId} not found`);
 
             // Check if the user has already reported this comment
             const alreadyReported = await this.reports_db.where({ commentId, reporterEmail }).first();
@@ -162,7 +163,7 @@ class commentDAO extends VolcanoDAO {
             // Delete the comment if it has 3 or more reports
             const updatedComment = await this.reports_db.select('reports').where({ commentId }).first();
             if (updatedComment.reports >= 3) {
-                await this.db.where({ id: commentId }).del();
+                await this.db.where({ commentId }).del();
             }
 
             // Return success

@@ -33,9 +33,6 @@ router.get('/', async (req, res, next) => {
 // Comments Router
 router.use('/comments', require('./comments'));
 
-// Comment Router
-router.use('/comment/:commentID', require('./comment'));
-
 // Eruptions Router
 router.use('/eruptions', require('./eruption'));
 
