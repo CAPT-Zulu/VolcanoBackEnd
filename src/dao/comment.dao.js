@@ -130,11 +130,13 @@ class commentDAO {
             // Get the comments for the volcano
             const comments = await this.db.select('commentId').where({ volcanoId }); // Add a limit to the number of comments returned
 
-            // Return an error if no comments are found
-            if (!comments.length) throw new HttpException(404, `No comments found for volcano with ID ${volcanoId}`);
-
-            // Return the comments
-            return comments;
+            // Check if any comments are found
+            if (!comments.length) {
+                return { message: `No comments found for volcano with ID ${volcanoId}` };
+            } else {
+                // Return the comments
+                return comments;
+            }
         } catch (err) {
             // Return an error if failed to get comments
             throw new HttpException(err.status || 500, err.message || 'Failed to get comments');
