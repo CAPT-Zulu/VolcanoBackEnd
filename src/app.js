@@ -47,7 +47,7 @@ app.get('/', swaggerUi.setup(swaggerDocument)); // Swagger document
 // API Routes
 app.use('/countries', countriesRouter); // Countries API router
 app.use('/volcanoes', volcanoesRouter); // Volcanoes API router
-app.use('/volcano/:id', volcanoRouter); // Volcano API router
+app.use('/volcano/:volcanoID', volcanoRouter); // Volcano API router
 app.use('/user', userRouter); // User API router
 app.use('/me', meRouter); // Me router, used for assessment purposes (Provides my information)
 

@@ -17,7 +17,7 @@ router.use((req, res, next) => {
 router.get('/', async (req, res, next) => {
     try {
         // Get volcano ID parameter
-        const volcanoID = parseInt(req.params.id);
+        const volcanoID = parseInt(req.params.volcanoID);
 
         // Retrieve volcano by ID
         const volcano = await req.volcanoDAO.getVolcanoById(volcanoID);
