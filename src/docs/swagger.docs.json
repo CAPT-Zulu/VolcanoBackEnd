@@ -1659,12 +1659,12 @@
         }
       }
     },
-    "/volcano/{volcanoID}/image": {
+    "/volcano/{volcanoID}/comment": {
       "get": {
         "tags": [
-          "Images"
+          "comments"
         ],
-        "description": "Returns a list of image URLs for a specific volcano, identified by its ID in the path parameter. The volcano ID is required.",
+        "description": "Returns a list of comment URLs for a specific volcano, identified by its ID in the path parameter. The volcano ID is required.",
         "parameters": [
           {
             "name": "volcanoID",
@@ -1678,7 +1678,7 @@
         ],
         "responses": {
           "200": {
-            "description": "An array of image URLs. An example of the first element in the array is shown below.",
+            "description": "An array of comment URLs. An example of the first element in the array is shown below.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1686,9 +1686,9 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "imageUrl": {
+                      "commentUrl": {
                         "type": "string",
-                        "example": "https://example.com/image.jpg"
+                        "example": "https://example.com/comment.jpg"
                       }
                     }
                   }
@@ -1717,7 +1717,7 @@
             }
           },
           "404": {
-            "description": "No images found for volcano",
+            "description": "No comments found for volcano",
             "content": {
               "application/json": {
                 "schema": {
@@ -1729,7 +1729,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "No images found for volcano with ID 1"
+                      "example": "No comments found for volcano with ID 1"
                     }
                   }
                 }
@@ -1740,9 +1740,9 @@
       },
       "post": {
         "tags": [
-          "Images"
+          "comments"
         ],
-        "description": "Uploads an image for a volcano, specified by ID in the path parameter. Requires authentication (JWT token) and the image URL in the request body.",
+        "description": "Uploads an comment for a volcano, specified by ID in the path parameter. Requires authentication (JWT token) and the comment URL in the request body.",
         "parameters": [
           {
             "name": "volcanoID",
@@ -1755,16 +1755,16 @@
           }
         ],
         "requestBody": {
-          "description": "The URL of the image to upload.",
+          "description": "The URL of the comment to upload.",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "imageUrl": {
+                  "commentUrl": {
                     "type": "string",
-                    "example": "https://example.com/image.jpg"
+                    "example": "https://example.com/comment.jpg"
                   }
                 }
               }
@@ -1778,7 +1778,7 @@
         ],
         "responses": {
           "201": {
-            "description": "Image uploaded successfully.",
+            "description": "comment uploaded successfully.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1786,7 +1786,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Image posted"
+                      "example": "comment posted"
                     }
                   }
                 }
@@ -1794,7 +1794,7 @@
             }
           },
           "400": {
-            "description": "Missing volcano ID or image URL",
+            "description": "Missing volcano ID or comment URL",
             "content": {
               "application/json": {
                 "schema": {
@@ -1806,7 +1806,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Volcano ID, image URL and user email are required parameters"
+                      "example": "Volcano ID, comment URL and user email are required parameters"
                     }
                   }
                 }
@@ -1860,9 +1860,9 @@
       },
       "delete": {
         "tags": [
-          "Images"
+          "comments"
         ],
-        "description": "Flags an image for removal, specified by its ID. Requires authentication (JWT token). If an image receives three flags, it will be automatically deleted from the database.",
+        "description": "Flags an comment for removal, specified by its ID. Requires authentication (JWT token). If an comment receives three flags, it will be automatically deleted from the database.",
         "parameters": [
           {
             "name": "volcanoID",
@@ -1874,9 +1874,9 @@
             }
           },
           {
-            "name": "imageID",
+            "name": "commentID",
             "in": "path",
-            "description": "ID of the image",
+            "description": "ID of the comment",
             "required": true,
             "schema": {
               "type": "integer"
@@ -1890,7 +1890,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Image flagged successfully (No Content)."
+            "description": "comment flagged successfully (No Content)."
           },
           "400": {
             "description": "Missing parameters",
@@ -1905,7 +1905,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Volcano ID, image ID, and reporter email are required parameters"
+                      "example": "Volcano ID, comment ID, and reporter email are required parameters"
                     }
                   }
                 }
@@ -1936,7 +1936,7 @@
             }
           },
           "404": {
-            "description": "Image not found",
+            "description": "comment not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1948,7 +1948,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "Image with ID 1 for volcano with ID 1 not found"
+                      "example": "comment with ID 1 for volcano with ID 1 not found"
                     }
                   }
                 }
@@ -1956,7 +1956,7 @@
             }
           },
           "409": {
-            "description": "User already reported this image",
+            "description": "User already reported this comment",
             "content": {
               "application/json": {
                 "schema": {
@@ -1968,7 +1968,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "User example@example.com has already reported image with ID 1"
+                      "example": "User example@example.com has already reported comment with ID 1"
                     }
                   }
                 }

@@ -1,53 +1,53 @@
 const express = require('express');
 const createError = require('http-errors');
 const router = express.Router({ mergeParams: true });
-const ImageDAO = require('../dao/image.dao');
+const commentDAO = require('../dao/comment.dao');
 
 // Volcano route middleware
 router.use((req, res, next) => {
-    // Create a new instance of ImageDAO and attach it to the request object
-    req.imageDAO = new ImageDAO(req.db, req.user);
+    // Create a new instance of commentDAO and attach it to the request object
+    req.commentDAO = new commentDAO(req.db, req.user);
     next();
 });
 
-// Get Images Route
+// Get comments Route
 router.get("/", async (req, res, next) => {
     try {
         // Get volcano ID
         const volcanoID = req.params.volcanoID;
 
-        // Attempt to get images
-        const images = await req.imageDAO.getImages(volcanoID);
+        // Attempt to get comments
+        const comments = await req.commentDAO.getcomments(volcanoID);
 
-        // Return images with 200 status code
-        res.status(200).json(images);
+        // Return comments with 200 status code
+        res.status(200).json(comments);
     } catch (err) {
-        // Return an error if failed to get images
-        next(createError(err.status || 500, err.message || 'Failed to get images'));
+        // Return an error if failed to get comments
+        next(createError(err.status || 500, err.message || 'Failed to get comments'));
     }
 });
 
-// Post Image Route
+// Post comment Route
 router.post("/", async (req, res, next) => {
     try {
         // Check if user is authenticated
         if (req.user) {
-            // Get volcano ID and image URL from request body
+            // Get volcano ID and comment URL from request body
             const volcanoID = req.params.volcanoID;
-            const { imageUrl } = req.body;
+            const { commentUrl } = req.body;
 
-            // Attempt to post image
-            await req.imageDAO.postImage(volcanoID, imageUrl, req.user.email);
+            // Attempt to post comment
+            await req.commentDAO.postcomment(volcanoID, commentUrl, req.user.email);
 
             // Return success message with 201 status code
-            res.status(201).json({ message: "Image posted" });
+            res.status(201).json({ message: "comment posted" });
         } else {
             // Return an error if user is not authenticated
             return next(createError(401, "Unauthorized"));
         }
     } catch (err) {
-        // Return an error if failed to post image
-        next(createError(err.status || 500, err.message || 'Failed to post image'));
+        // Return an error if failed to post comment
+        next(createError(err.status || 500, err.message || 'Failed to post comment'));
     }
 });
 
@@ -56,13 +56,13 @@ router.post("/report", async (req, res, next) => {
     try {
         // Check if user is authenticated
         if (req.user) {
-            // Get volcano ID, image ID, and reporter email
+            // Get volcano ID, comment ID, and reporter email
             const volcanoID = req.params.volcanoID;
-            const imageID = req.params.imageID;
+            const commentID = req.params.commentID;
             const reporterEmail = req.user.email;
 
             // Attempt to post report
-            await req.imageDAO.postReport(volcanoID, imageID, reporterEmail);
+            await req.commentDAO.postReport(volcanoID, commentID, reporterEmail);
 
             // Return success message with 201 status code
             res.status(201).json({ message: "Report submitted" });
