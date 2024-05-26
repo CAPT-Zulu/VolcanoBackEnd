@@ -5,8 +5,11 @@ const badWords = require('bad-words');
 // comment Data Access Object
 class commentDAO {
     constructor(db, authenticated = false) {
-        this.db = db('comments'); // Set the table for the DAO
-        this.reports_db = db('comment_reports'); // Set the table for comment reports
+        // Assign the db object to the class
+        this.db = db('comments');
+        // Assign additional reports_db object to the class
+        this.reports_db = db('comment_reports');
+        // Mount the VolcanoDAO
         this.volcanoDAO = new VolcanoDAO(db, authenticated); // Create a new instance of the VolcanoDAO
     }
 

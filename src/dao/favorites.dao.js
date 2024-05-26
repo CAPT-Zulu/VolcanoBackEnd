@@ -1,10 +1,14 @@
 const VolcanoDAO = require("./volcano.dao")
+const UserDAO = require("./user.dao")
 const HttpException = require('../exceptions/HttpException');
 
-class FavoritesDAO extends VolcanoDAO {
+class FavoritesDAO {
     constructor(db, authenticated = false) {
-        super(db, authenticated);
+        // Assign the db object to the class
         this.db = db('favorites');
+        // Mount the VolcanoDAO and UserDAO
+        this.volcanoDAO = new VolcanoDAO(db, authenticated); // Create a new instance of the VolcanoDAO
+        this.userDAO = new UserDAO(db, authenticated); // Create a new instance of the UserDAO
     }
 
     // Add a favorite to the database

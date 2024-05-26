@@ -5,8 +5,8 @@ const bcrypt = require('bcrypt');
 // User Data Access Object
 class UserDAO {
     constructor(db, authenticated = false) {
-        // Attach the Knex instance to the DAO
-        this.db = db;
+        // Assign the db object to the class
+        this.db = db('users');
         // Define fields that are not accessible to non-authenticated users
         this.nonAuthFields = authenticated ? ['email', 'firstName', 'lastName', 'dob', 'address'] : ['email', 'firstName', 'lastName'];
     }
@@ -15,8 +15,7 @@ class UserDAO {
     async findUserByEmail(email) {
         try {
             // Return the user with the provided email
-            return this.db('users')
-                .select('email', 'password_hash')
+            return this.select('email', 'password_hash')
                 .where({ email })
                 .first();
         } catch (err) {
@@ -41,7 +40,7 @@ class UserDAO {
                 .then(() => bcrypt.hash(password, 10))
                 // Insert the user into the database
                 .then(hashedPassword => {
-                    return this.db('users').insert({ email, password_hash: hashedPassword });
+                    return this.db.insert({ email, password_hash: hashedPassword });
                 });
         } catch (err) {
             // Return an error if failed to create user
@@ -85,8 +84,7 @@ class UserDAO {
             if (!this.authenticated) throw new HttpException(401, 'Unauthorized');
 
             // Retrieve the user profile by email
-            const profile = await this.db('users')
-                .select(this.nonAuthFields) // User's should not be able to swap user accounts mid-request, so this should be fine.
+            const profile = await this.select(this.nonAuthFields)
                 .where({ email })
                 .first();
 
@@ -136,8 +134,7 @@ class UserDAO {
             }
 
             // Update the user profile with the provided email
-            return this.db('users')
-                .select(this.nonAuthFields)
+            return this.select(this.nonAuthFields)
                 .where({ email })
                 .update(profile);
         } catch (err) {
