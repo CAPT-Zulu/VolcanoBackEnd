@@ -46,13 +46,15 @@ class FavoritesDAO {
             const savedVolcanoes = await this.db.select('volcanoID').where({ userEmail });
 
             // Check if any volcanoes are saved
-            if (!savedVolcanoes.length) throw new HttpException(404, `No favorites found for user ${userEmail}`);
+            if (!savedVolcanoes.length) {
+                return { message: `No favorites found for user ${userEmail}` };
+            } else {
+                // Extract the volcano ids from the saved volcanoes
+                const volcanoIDs = savedVolcanoes.map(volcano => volcano.volcanoID);
 
-            // Extract the volcano ids from the saved volcanoes
-            const volcanoIDs = savedVolcanoes.map(volcano => volcano.volcanoID);
-
-            // Get the details of the saved volcanoes
-            return this.getVolcanoesInList(volcanoIDs);
+                // Get the details of the saved volcanoes
+                return this.volcanoDAO.getVolcanoesInList(volcanoIDs);
+            }
         } catch (err) {
             // Return an error if failed to get all favorites
             throw new HttpException(err.status || 500, err.message || 'Failed to get all favorites');

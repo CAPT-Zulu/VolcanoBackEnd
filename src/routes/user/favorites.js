@@ -4,9 +4,31 @@ const FavoritesDAO = require('../../dao/favorites.dao');
 
 // Favorites Route Middleware
 router.use((req, res, next) => {
-    // Create a new instance of FavoritesDAO and attach it to the request object
+    // Create a new instance of FavoritesDAO and attach it to the request object.
+    // This isn't great cause it creates a new instance of userDAO despite it 
+    // already existing in the user / index.js file
     req.favoritesDAO = new FavoritesDAO(req.db, req.user);
     next();
+});
+
+// Get Saved Volcanoes Route
+router.get('/', async (req, res, next) => {
+    try {
+        // Check if user is authenticated
+        if (req.user) {
+            // Retrieve saved volcanoes
+            const savedVolcanoes = await req.favoritesDAO.getAllFavorites(req.user.email);
+
+            // Return saved volcanoes with 200 status code
+            res.status(200).json(savedVolcanoes);
+        } else {
+            // Return an error if user is not authenticated
+            return next(createError(401, "Unauthorized"));
+        }
+    } catch (err) {
+        // Return an error if failed to get saved volcanoes
+        next(createError(err.status || 500, err.message || 'Failed to get saved volcanoes'));
+    }
 });
 
 // Save Volcano Route

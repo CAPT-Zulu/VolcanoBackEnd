@@ -6,6 +6,8 @@ class UserDAO {
     constructor(db, authenticated = false) {
         // Assign the db object to the class
         this.db = db('users');
+        // Assign authenticated status to the class
+        this.authenticated = authenticated;
         // Define fields that are not accessible to non-authenticated users
         this.nonAuthFields = authenticated ? ['email', 'firstName', 'lastName', 'dob', 'address'] : ['email', 'firstName', 'lastName'];
     }
@@ -14,7 +16,7 @@ class UserDAO {
     async findUserByEmail(email) {
         try {
             // Return the user with the provided email
-            return this.select('email', 'password_hash')
+            return this.db.select('email', 'password_hash')
                 .where({ email })
                 .first();
         } catch (err) {
@@ -83,7 +85,7 @@ class UserDAO {
             if (!this.authenticated) throw new HttpException(401, 'Unauthorized');
 
             // Retrieve the user profile by email
-            const profile = await this.select(this.nonAuthFields)
+            const profile = await this.db.select(this.nonAuthFields)
                 .where({ email })
                 .first();
 
@@ -133,7 +135,7 @@ class UserDAO {
             }
 
             // Update the user profile with the provided email
-            return this.select(this.nonAuthFields)
+            return this.db.select(this.nonAuthFields)
                 .where({ email })
                 .update(profile);
         } catch (err) {
