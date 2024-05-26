@@ -1,14 +1,6 @@
 const express = require('express');
 const router = express.Router();
 var createError = require('http-errors')
-var VolcanoDAO = require('../dao/volcano.dao');
-
-// Volcanoes route middleware
-router.use((req, res, next) => {
-    // Create a new instance of VolcanoDAO and attach it to the request object
-    req.volcanoDAO = new VolcanoDAO(req.db, req.user);
-    next();
-});
 
 // Route for fetching volcanoes by country and optional population radius
 router.get('/', async (req, res, next) => {

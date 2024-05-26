@@ -1,7 +1,7 @@
 const express = require('express');
 const createError = require('http-errors');
 const router = express.Router({ mergeParams: true });
-const VolcanoDAO = require('../dao/volcano.dao');
+const VolcanoDAO = require('../dao/volcano');
 
 // Volcano route middleware
 router.use((req, res, next) => {
@@ -13,7 +13,6 @@ router.use((req, res, next) => {
 // Route for getting volcano data by ID
 router.get('/', async (req, res, next) => {
     try {
-        console.log(req.params.id, req.user);
         // Get volcano ID parameter
         const volcanoID = parseInt(req.params.id);
 

@@ -10,7 +10,6 @@ router.use((req, res, next) => {
     next();
 });
 
-
 // Get Images Route
 router.get("/", async (req, res, next) => {
     try {

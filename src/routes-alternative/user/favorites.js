@@ -10,7 +10,7 @@ router.use((req, res, next) => {
     next();
 });
 
-// Save Volcano Route
+// Save Volcano Route (Use put instead of post?)
 router.post('/', async (req, res, next) => {
     try {
         // Check if user is authenticated

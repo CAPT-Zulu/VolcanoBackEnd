@@ -1,6 +1,6 @@
 const HttpException = require('../exceptions/HttpException');
 const bcrypt = require('bcrypt');
-const moment = require('moment');
+// const moment = require('moment');
 
 // User Data Access Object
 class UserDAO {
@@ -96,7 +96,10 @@ class UserDAO {
             if (!profile) throw new HttpException(404, 'User not found');
 
             // Fix the date on dob (Otherwise it will be returned as a timestamp)
-            if (profile.dob) profile.dob = moment(profile.dob).format('YYYY-MM-DD');
+            // if (profile.dob) profile.dob = moment(profile.dob).format('YYYY-MM-DD');
+
+            // Fix the date on dob (Otherwise it will be returned as a timestamp)
+            if (profile.dob) profile.dob = new Date(profile.dob).toISOString().split('T')[0];
 
             // Return the user profile
             return profile;

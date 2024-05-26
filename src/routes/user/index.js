@@ -1,8 +1,7 @@
-const express = require("express");
+const router = require("express").Router({ mergeParams: true });
 const createError = require('http-errors');
-const router = express.Router();
-const authenticateToken = require('../middleware/auth.middleware');
-const UserDAO = require("../dao/user.dao");
+const authenticateToken = require('../../middleware/auth.middleware');
+const UserDAO = require("../../dao/user.dao");
 const jwt = require("jsonwebtoken");
 
 // User route middleware
@@ -52,5 +51,11 @@ router.post("/login", async (req, res, next) => {
     next(createError(err.status || 500, err.message || 'Failed to login'));
   }
 });
+
+// Profile Router
+router.use("/:email/profile", authenticateToken, require("./profile"));
+
+// Favorites Router
+router.use("/:email/favorites", authenticateToken, require("./favorites"));
 
 module.exports = router;

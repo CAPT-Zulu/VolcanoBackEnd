@@ -3,7 +3,7 @@ const router = express.Router();
 const createError = require('http-errors');
 const CountryDAO = require('../dao/country.dao');
 
-// Register Route middleware
+// Country route middleware
 router.use((req, res, next) => {
     // Create a new instance of CountryDAO and attach it to the request object
     req.countryDAO = new CountryDAO(req.db);
