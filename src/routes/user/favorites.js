@@ -40,7 +40,7 @@ router.post('/', async (req, res, next) => {
             const { volcanoID } = req.body;
 
             // Attempt to save volcano
-            await req.favoritesDAO.saveVolcano(volcanoID);
+            await req.favoritesDAO.addFavorite(volcanoID);
 
             // Return success message with 200 status code
             res.status(200).json({ message: `Volcano with ID ${volcanoID} saved to favorites` });
@@ -55,7 +55,7 @@ router.post('/', async (req, res, next) => {
 });
 
 // Remove Saved Volcano Route
-router.delete("/:volcanoID/save", async (req, res, next) => {
+router.delete("/:volcanoID", async (req, res, next) => {
     try {
         // Check if user is authenticated
         if (req.user) {
@@ -63,7 +63,7 @@ router.delete("/:volcanoID/save", async (req, res, next) => {
             const volcanoID = req.params.volcanoID;
 
             // Attempt to remove saved volcano
-            await req.favoritesDAO.removeSavedVolcano(volcanoID);
+            await req.favoritesDAO.deleteFavorite(volcanoID);
 
             // Return success message with 200 status code
             res.status(200).json({ message: `Volcano with ID ${volcanoID} removed from saved volcanoes` });

@@ -6,6 +6,8 @@ class FavoritesDAO {
     constructor(db, authenticated = false) {
         // Assign the db object to the class
         this.db = db('favorites');
+        // Assign authenticated status to the class
+        this.authenticated = authenticated;
         // Mount the VolcanoDAO and UserDAO
         this.volcanoDAO = new VolcanoDAO(db, authenticated); // Create a new instance of the VolcanoDAO
         this.userDAO = new UserDAO(db, authenticated); // Create a new instance of the UserDAO
@@ -18,7 +20,7 @@ class FavoritesDAO {
             if (!volcanoID) throw new HttpException(400, 'Volcano ID is an required parameter');
 
             // Check if user is authenticated
-            if (!this.authenticated.email) throw new HttpException(401, 'Unauthorized');
+            if (!this.authenticated) throw new HttpException(401, 'Unauthorized');
 
             // Check if the volcano exists
             const volcanoExists = await this.volcanoDAO.getVolcanoById(volcanoID);
@@ -71,8 +73,12 @@ class FavoritesDAO {
             if (!this.authenticated.email) throw new HttpException(401, 'Unauthorized');
 
             // Check if the volcano exists
-            const volcanoExists = await this.getVolcanoById(volcanoID);
+            const volcanoExists = await this.volcanoDAO.getVolcanoById(volcanoID);
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoID} not found`);
+
+            // Check if the volcano is saved by the user
+            const savedVolcano = await this.db.where({ volcanoID, userEmail: this.authenticated.email }).first();
+            if (!savedVolcano) throw new HttpException(404, `Volcano with ID ${volcanoID} not saved by user ${this.authenticated.email}`);
 
             // Delete the saved volcano
             return this.db.where({ volcanoID, userEmail: this.authenticated.email }).del();
