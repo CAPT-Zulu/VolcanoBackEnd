@@ -26,7 +26,7 @@ router.get('/', async (req, res, next) => {
     }
 });
 
-// Guess Eruption Year Route
+// Guess Eruption Year Route (Also counts for updating the guess)
 router.post('/', async (req, res, next) => {
     try {
         // Check if user is authenticated
