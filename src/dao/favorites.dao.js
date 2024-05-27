@@ -6,7 +6,7 @@ class FavoritesDAO extends VolcanoDAO {
         // Call the super class constructor
         super(db, false); // Pass false to prevent getting all fields #### TO BE CHANGED ####
         // Assign the db object to the class
-        this.db = () => db.table('favorites');
+        this.db_fav = () => db.table('favorites');
         // Assign authenticated status to the class
         this.authenticated = authenticated;
     }
@@ -25,13 +25,13 @@ class FavoritesDAO extends VolcanoDAO {
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoID} not found`);
 
             // Check if the volcano is already saved by the user
-            const alreadySaved = await this.db()
+            const alreadySaved = await this.db_fav()
                 .where({ volcanoID, userEmail: this.authenticated.email })
                 .first();
             if (alreadySaved) throw new HttpException(409, `Volcano with ID ${volcanoID} is already saved by user ${this.authenticated.email}`);
 
             // Save the volcano to the user's saved list
-            return this.db()
+            return this.db_fav()
                 .insert({ volcanoID, userEmail: this.authenticated.email });
         } catch (err) {
             // Return an error if failed to save volcano
@@ -46,13 +46,13 @@ class FavoritesDAO extends VolcanoDAO {
             if (!userEmail) throw new HttpException(400, 'User email is a required parameter');
 
             // Get the ids of all saved volcanoes
-            const savedVolcanoes = await this.db()
+            const savedVolcanoes = await this.db_fav()
                 .select('volcanoID')
                 .where({ userEmail });
 
             // Check if any volcanoes are saved
             if (!savedVolcanoes.length) {
-                return { message: `No favorites found for user ${userEmail}` };
+                return [];
             } else {
                 // Extract the volcano ids from the saved volcanoes
                 const volcanoIDs = savedVolcanoes.map(volcano => volcano.volcanoID);
@@ -80,13 +80,13 @@ class FavoritesDAO extends VolcanoDAO {
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoID} not found`);
 
             // Check if the volcano is saved by the user
-            const savedVolcano = await this.db()
+            const savedVolcano = await this.db_fav()
                 .where({ volcanoID, userEmail: this.authenticated.email })
                 .first();
             if (!savedVolcano) throw new HttpException(404, `Volcano with ID ${volcanoID} not saved by user ${this.authenticated.email}`);
 
             // Delete the saved volcano
-            return this.db()
+            return this.db_fav()
                 .where({ volcanoID, userEmail: this.authenticated.email })
                 .del();
         } catch (err) {

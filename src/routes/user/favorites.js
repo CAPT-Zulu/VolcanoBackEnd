@@ -16,8 +16,11 @@ router.get('/', async (req, res, next) => {
     try {
         // Check if user is authenticated
         if (req.user) {
+            // Get user email
+            const userEmail = req.params.email;
+
             // Retrieve saved volcanoes
-            const savedVolcanoes = await req.favoritesDAO.getAllFavorites(req.user.email);
+            const savedVolcanoes = await req.favoritesDAO.getAllFavorites(userEmail);
 
             // Return saved volcanoes with 200 status code
             res.status(200).json(savedVolcanoes);

@@ -57,12 +57,13 @@ router.put("/:commentID", async (req, res, next) => {
     try {
         // Check if user is authenticated
         if (req.user) {
-            // Get comment ID and comment from the request
+            // Get parameters from request
+            const volcanoID = req.params.volcanoID;
             const commentID = req.params.commentID;
             const comment = req.body.comment;
 
             // Attempt to update comment
-            await req.commentDAO.updateComment(commentID, comment, req.user.email);
+            await req.commentDAO.updateComment(volcanoID, commentID, comment, req.user.email);
 
             // Return success message with 200 status code
             res.status(200).json({ message: "Comment updated", commentID });
@@ -81,11 +82,12 @@ router.delete("/:commentID", async (req, res, next) => {
     try {
         // Check if user is authenticated
         if (req.user) {
-            // Get comment ID from request parameters
+            // Get parameters from request
+            const volcanoID = req.params.volcanoID;
             const commentID = req.params.commentID;
 
             // Attempt to delete comment
-            await req.commentDAO.deleteComment(commentID, req.user.email);
+            await req.commentDAO.deleteComment(volcanoID, commentID, req.user.email);
 
             // Return success message with 200 status code
             res.status(200).json({ message: "comment deleted" });
@@ -104,13 +106,12 @@ router.post("/:commentID/report", async (req, res, next) => {
     try {
         // Check if user is authenticated
         if (req.user) {
-            // Get volcano ID, comment ID, and reporter email
+            // Get parameters from request
             const volcanoID = req.params.volcanoID;
             const commentID = req.params.commentID;
-            const reporterEmail = req.user.email;
 
             // Attempt to post report
-            await req.commentDAO.postReport(volcanoID, commentID, reporterEmail);
+            await req.commentDAO.postReport(volcanoID, commentID);
 
             // Return success message with 201 status code
             res.status(201).json({ message: "Report submitted" });

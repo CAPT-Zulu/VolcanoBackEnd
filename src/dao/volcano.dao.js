@@ -6,6 +6,8 @@ class VolcanoDAO {
     constructor(db, authenticated = false) {
         // Assign the db object to the class
         this.db = () => db.table('data');
+        // Assign authenticated status to the class
+        this.authenticated = authenticated;
         // Define valid distances for population radius
         this.validDistances = ['5km', '10km', '30km', '100km'];
         // Define fields that are not accessible to non-authenticated users
