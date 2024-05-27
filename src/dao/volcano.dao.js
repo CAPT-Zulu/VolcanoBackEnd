@@ -10,6 +10,8 @@ class VolcanoDAO {
         this.validDistances = ['5km', '10km', '30km', '100km'];
         // Define fields that are not accessible to non-authenticated users
         this.nonAuthFields = authenticated ? '*' : ['id', 'name', 'country', 'region', 'subregion', 'last_eruption', 'summit', 'elevation', 'latitude', 'longitude'];
+        // Allowed queries for getVolcanoesByQuery
+        this.allowedQueries = ['name', 'country', 'region', 'last_eruption', 'summit', 'elevation'];
     }
 
     // Get volcano by id
@@ -31,6 +33,29 @@ class VolcanoDAO {
         } catch (err) {
             // Throw an error if failed to retrieve volcano by id
             throw new HttpException(err.status || 500, err.message || 'Failed to get volcano by id');
+        }
+    }
+
+    // Get volcanos by multiple custom queries
+    async getVolcanoesByQuery(queries) {
+        try {
+            // If queries are not provided, throw an error
+            if (!queries) throw new HttpException(400, 'Queries are required.');
+
+            // Ensure that all queries are valid
+            if (!Object.keys(queries).every(query => allowedQueries.includes(query))) {
+                throw new HttpException(400, 'Invalid queries provided. Allowed queries: ' + allowedQueries.join(', '));
+            }
+
+            // Create a query to get volcanoes by custom queries
+            const query = this.db.select(this.nonAuthFields)
+                .where(queries);
+
+            // Return the query
+            return await query;
+        } catch (err) {
+            // Throw an error if failed to retrieve volcanoes by custom queries
+            throw new HttpException(err.status || 500, err.message || 'Failed to get volcanoes by custom queries');
         }
     }
 
@@ -64,26 +89,18 @@ class VolcanoDAO {
     }
 
     // Get random volcanos
-    async getRandomVolcanos(count) {
+    async getRandomVolcanos(amount) {
         try {
-            // Check if count was provided
-            if (!count) throw new HttpException(400, 'Count is a required query parameter.');
+            // If amount is not provided, set it to 1
+            amount = amount ? amount : 1;
 
-            // Check if count is within the allowed range (1-10)
-            if (count < 1 || count > 10) throw new HttpException(400, 'Invalid value for count. Allowed values: 1-10');
+            // Check if amount is within the allowed range (1-10) and is a number
+            if (amount < 1 || amount > 10 || isNaN(amount)) throw new HttpException(400, 'Invalid value for amount. Allowed numbers are between 1-10');
 
-            // Get the total number of volcanoes
-            const totalVolcanoes = await this.db.count('id').first();
-
-            // Generate a random number between 1 and the total number of volcanoes
-            const randoms = [...Array(count).keys()].map(() => Math.floor(Math.random() * totalVolcanoes.count) + 1);
-
-            // Retrieve the random volcanoes
+            // Get random volcanoes
             const randomVolcanoes = await this.db.select(this.nonAuthFields)
-                .whereIn('id', randoms);
-
-            // If no random volcanoes are found, return an error
-            if (!randomVolcanoes.length) throw new Error('No random volcanoes found.'); // Will be passed as an 500 error
+                .orderByRaw('RAND()')
+                .limit(amount);
 
             // Return the random volcanoes
             return randomVolcanoes;

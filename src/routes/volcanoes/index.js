@@ -34,14 +34,31 @@ router.get('/', async (req, res, next) => {
     }
 });
 
+// Route for fetching volcanoes by custom queries
+router.get('/adv', async (req, res, next) => {
+    try {
+        // Retrieve the query parameters
+        const queries = req.query;
+
+        // Retrieve all volcanoes (Error handling is done in the DAO to abstract the invalid format of the query parameters)
+        const volcanoes = await req.volcanoDAO.getVolcanoesByQuery(queries);
+
+        // Return the volcanoes with 200 status code
+        res.status(200).json(volcanoes);
+    } catch (err) {
+        // Return an error if failed to get volcanoes by custom queries
+        next(createError(err.status || 500, err.message || 'Failed to get volcanoes by custom queries'));
+    }
+});
+
 // Get Random Volcano Route
 router.get("/random", async (req, res, next) => {
     try {
-        // Get count of volcanoes passed in the request
-        const count = req.query.count;
+        // Get optional amount of volcanoes passed in the request
+        const amount = req.query.amount;
 
         // Attempt to get random volcano
-        const randomVolcanos = await req.volcanoDAO.getRandomVolcanos(count);
+        const randomVolcanos = await req.volcanoDAO.getRandomVolcanos(amount);
 
         // Return random volcanos with 200 status code
         res.status(200).json(randomVolcanos);
