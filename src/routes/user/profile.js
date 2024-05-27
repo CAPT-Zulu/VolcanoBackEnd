@@ -29,13 +29,6 @@ router.put("/", async (req, res, next) => {
       // Attempt to update the profile
       const updatedProfile = await req.userDAO.updateProfile(userEmail, req.body);
 
-      console.log('Profile updated successfully');
-
-      // Retrieve updated profile
-      // const updatedProfile = await req.userDAO.getProfile(userEmail);
-
-      console.log('Profile retrieved successfully');
-
       // Return updated profile with 200 status code
       res.status(200).json(updatedProfile);
     } else {

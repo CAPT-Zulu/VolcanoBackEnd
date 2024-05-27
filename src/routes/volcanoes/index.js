@@ -40,8 +40,6 @@ router.get('/adv', async (req, res, next) => {
         // Retrieve the query parameters
         const queries = req.query;
 
-        console.log(queries);
-
         // Retrieve all volcanoes (Error handling is done in the DAO to abstract the invalid format of the query parameters)
         const volcanoes = await req.volcanoDAO.getVolcanoesByQuery(queries);
 
