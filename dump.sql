@@ -18,6 +18,62 @@ USE `volcanoes`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `comment_reports`
+--
+
+DROP TABLE IF EXISTS `comment_reports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comment_reports` (
+  `commentID` int NOT NULL,
+  `reporterEmail` varchar(254) NOT NULL,
+  PRIMARY KEY (`commentID`,`reporterEmail`),
+  KEY `reporterEmail_commentReports_idx` (`reporterEmail`),
+  CONSTRAINT `commentID_commentReports` FOREIGN KEY (`commentID`) REFERENCES `comments` (`commentID`),
+  CONSTRAINT `reporterEmail_commentReports` FOREIGN KEY (`reporterEmail`) REFERENCES `users` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comment_reports`
+--
+
+LOCK TABLES `comment_reports` WRITE;
+/*!40000 ALTER TABLE `comment_reports` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comment_reports` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `comments`
+--
+
+DROP TABLE IF EXISTS `comments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `comments` (
+  `commentID` int NOT NULL AUTO_INCREMENT,
+  `volcanoID` int NOT NULL,
+  `userEmail` varchar(254) NOT NULL,
+  `comment` varchar(254) NOT NULL,
+  PRIMARY KEY (`commentID`),
+  UNIQUE KEY `commentID_UNIQUE` (`commentID`),
+  KEY `volcanoID_comment_idx` (`volcanoID`),
+  KEY `userEmail_comment_idx` (`userEmail`),
+  CONSTRAINT `userEmail_comment` FOREIGN KEY (`userEmail`) REFERENCES `users` (`email`),
+  CONSTRAINT `volcanoID_comment` FOREIGN KEY (`volcanoID`) REFERENCES `data` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comments`
+--
+
+LOCK TABLES `comments` WRITE;
+/*!40000 ALTER TABLE `comments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `data`
 --
 
@@ -58,6 +114,59 @@ INSERT INTO `data` VALUES (1,'Abu','Japan','Japan, Taiwan, Marianas','Honshu','6
 UNLOCK TABLES;
 
 --
+-- Table structure for table `eruption_guesses`
+--
+
+DROP TABLE IF EXISTS `eruption_guesses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `eruption_guesses` (
+  `volcanoID` int NOT NULL,
+  `userEmail` varchar(254) NOT NULL,
+  `eruptionYear` int NOT NULL,
+  PRIMARY KEY (`volcanoID`,`userEmail`),
+  KEY `userEmail_eruption_idx` (`userEmail`),
+  CONSTRAINT `userEmail_eruption` FOREIGN KEY (`userEmail`) REFERENCES `users` (`email`),
+  CONSTRAINT `volcanoID_eruption` FOREIGN KEY (`volcanoID`) REFERENCES `data` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `eruption_guesses`
+--
+
+LOCK TABLES `eruption_guesses` WRITE;
+/*!40000 ALTER TABLE `eruption_guesses` DISABLE KEYS */;
+/*!40000 ALTER TABLE `eruption_guesses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `favorites`
+--
+
+DROP TABLE IF EXISTS `favorites`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `favorites` (
+  `volcanoID` int NOT NULL,
+  `userEmail` varchar(254) NOT NULL,
+  PRIMARY KEY (`volcanoID`,`userEmail`),
+  KEY `userEmail_favorites_idx` (`userEmail`),
+  CONSTRAINT `userEmail_favorites` FOREIGN KEY (`userEmail`) REFERENCES `users` (`email`),
+  CONSTRAINT `volcanoID_favorites` FOREIGN KEY (`volcanoID`) REFERENCES `data` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `favorites`
+--
+
+LOCK TABLES `favorites` WRITE;
+/*!40000 ALTER TABLE `favorites` DISABLE KEYS */;
+/*!40000 ALTER TABLE `favorites` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `users`
 --
 
@@ -65,10 +174,10 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
-  `email` varchar(255) NOT NULL,
+  `email` varchar(254) NOT NULL,
   `password_hash` char(64) NOT NULL,
-  `firstName` varchar(255) DEFAULT NULL,
-  `lastName` varchar(255) DEFAULT NULL,
+  `firstName` varchar(64) DEFAULT NULL,
+  `lastName` varchar(64) DEFAULT NULL,
   `dob` date DEFAULT NULL,
   `address` text,
   PRIMARY KEY (`email`)
@@ -81,7 +190,6 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES ('01d5db8a-aa9a-42ee-b58d-b278f486d11a@fake-email.com','$2b$10$KhcVvRaPAoZyaoP.OgQmPe3o91kZE.7VygEGyvGNn1hgWbTQmVqre',NULL,NULL,NULL,NULL),('06792398-b811-4305-a96d-97a1fcaec681@fake-email.com','$2b$10$ZgG65oZSOZ5lT2nWd6csguQE79CAE2LBJf56ywzmYzyzDvKms7FPi',NULL,NULL,NULL,NULL),('0914e604-a654-4b43-8ad9-a0e8f162aad7@fake-email.com','$2b$10$mFqZF1Y.Ca7xjEN9TztV0eFCR/hIYMWECztZQN3GTNDgtn8.H9y1G',NULL,NULL,NULL,NULL),('0af292bb-a8ed-474c-ae96-8ab7cc793b2b@fake-email.com','$2b$10$NqVXtr0gCRWuyMUxNy4GO.BJKiUD3I/FwbFYDOdqQ3IzMB9H3otj6',NULL,NULL,NULL,NULL),('12649857-6eb0-4b7c-8029-80aa6a6d9dd7@fake-email.com','$2b$10$lsiJUIZtfktli7Cx9Rnc8uf4.llHeTyR/K6UhEFIkDdJZs.PPW6sO',NULL,NULL,NULL,NULL),('1ae2ac89-d210-49ef-b776-c01f9201b0d5@fake-email.com','$2b$10$Cgiq.D8e/hShUB1mHE12BORehexVxW9CcWXWtI1PAINevdwY0m1ai','Eleonore','Lebsack','2024-04-21','629 Robel Inlet'),('1eee81c2-cafd-4918-9581-e02565a49ced@fake-email.com','$2b$10$.OV3QJseB7l5zB1golaQx.dri/tIq52W3e9qRDdb7m0dc1lNEj7Fq',NULL,NULL,NULL,NULL),('1f984d0f-1b4e-403c-a524-a7fdacf6d579@fake-email.com','$2b$10$r83UMqM.NeCMsqsLoA9KXOrbUOMkeWtMv2SDB2AGxFlqETodlskKm',NULL,NULL,NULL,NULL),('20c8dc61-74c4-4424-8080-06ad39883955@fake-email.com','$2b$10$fH3.RAAw/SO3rV1FfDKyA.CEMqU03eAScnKJDCpUar0cvFSdYBhaK','Myrtle','Nitzsche','2024-04-09','044 Shields Alley'),('21abdd49-479a-419d-82ab-2a20572b92d9@fake-email.com','$2b$10$Nk0GVe3PeFZh1XVOA5pjsOrqmR2QUaaTC/YxIPr/WnPQYvMAvYFTa','Providenci','Halvorson','2023-11-09','207 Nya Ports'),('266dbd2d-1dcc-4bf1-86ea-fb5570f8b154@fake-email.com','$2b$10$W0/QerMXdxx3yoC3hC6XIe5nmOlDM4QINsaQPwhId0aL0VdcUAB8y','Aglae','Robel','2023-10-07','5715 Muller Ramp'),('2c12dd2c-6368-4b26-beb1-cced5103dada@fake-email.com','$2b$10$V0x327UmOqE0vnjAjLZV/.uJCP8246.tEbIMJI8yjwadrlLMqX6lG','Mariana','Welch','2023-11-12','2638 Larson Shore'),('2ce13154-c096-422b-93c9-adc6dbb43c04@fake-email.com','$2b$10$uw6VtPXlw2jV3tGWbEtgG.CjAmo2s1NO7EcXteFlu4mOqMWYd9uVK',NULL,NULL,NULL,NULL),('2d129116-b9c7-4430-b3a9-d8086799cf24@fake-email.com','$2b$10$NHS3WUuevSEoBm78Wm4eAufItkF6xbSYh5y1Z.cEljnmAnfPelaj.',NULL,NULL,NULL,NULL),('2d7bfbe6-1c93-487c-80cb-87d6ce55cb86@fake-email.com','$2b$10$IypFYtZd9/EIxSjWwOJlReP1qmPchK2mZpN0aTdGaZ.OLdv7HYuHi','Abbigail','Walsh','2023-07-11','087 Ernser Pass'),('2dc6dbca-e9fd-41bb-9ab1-9b55ace03f1c@fake-email.com','$2b$10$0cQuSXWaw9icgrQwIN6huuvxwMEWr1bQT8zumkBMNtl5TAw5Dc7hq','Itzel','Barton','2023-10-21','23183 Kohler Squares'),('3788eeb2-c0db-4227-bf45-0110a7036b22@fake-email.com','$2b$10$AYd6PKktL0SHpqC1hiSfhubqtqZWkI8RGG2RxmSyF4dxg0uCluGfC',NULL,NULL,NULL,NULL),('396441bf-55be-42bb-bea9-fdd1294affb9@fake-email.com','$2b$10$fZqjI1N9h88/Mx59dZQtqu7qrTHEa6aCGCVh/dsaBr6ke9IDuG3pO',NULL,NULL,NULL,NULL),('3dad68c0-f9d7-43c3-9a6f-f848929a946c@fake-email.com','$2b$10$jj44Ugvb9YUyuHBb7rlCk..M4zRGAKhxDcW/uqU.eARUi7eWDT9dS','Rupert','Mayer','2023-08-29','901 Schaefer Hills'),('3f6e6ef3-bace-403e-b5b5-13f0166b8427@fake-email.com','$2b$10$ppgnFjxP6X7v.ySuSYu2eOhzelNwLXG1shO6qjDnH9RYbPB4ij/Ta','Damon','Bailey','2024-01-23','3286 Okuneva Squares'),('3f766e07-5957-4a51-ab6c-77318df78004@fake-email.com','$2b$10$AavWRvXfuFH8e/kMkTb0p.aaUKPwSE8ySPl007.RIkEi.dFBJra/.',NULL,NULL,NULL,NULL),('4152aaa4-e5ef-4e1e-81a9-24795677f244@fake-email.com','$2b$10$lhti8U/GraWaoV/lgSqbuuqup7TZ68GMMZ0i4ey1Dqj3OmAp5GLyi','General','Herzog','2023-09-25','111 Kihn Shoal'),('4242d1cf-6e09-414a-bf76-6b401b1f5563@fake-email.com','$2b$10$5iZkSKHsZrQwkqGFbf8xBOY6SkWp/5V12VsvppVO36ICqdmOUcwmK','Lauryn','Kertzmann','2023-10-28','3776 Etha Port'),('424a71cf-1906-46a7-8f47-f4d4f15b8ab9@fake-email.com','$2b$10$EWMTQ1DDD7fl.3msQB04A.AmDezAyRQI7HA4dMP.CAjl9FYfTg6Ey','Mittie','Goyette','2023-07-13','81645 Althea Village'),('42831c73-92d9-4a22-ac4b-320a87398b5e@fake-email.com','$2b$10$5dTcE3Zpvo2eURuJus3yEODZS6rbNSOeqDL4iM4bPmOJarqthQZ/O','Augustine','Goodwin','2023-05-31','27984 Haleigh Pike'),('44290d28-8a17-4252-b51d-4fad310966e3@fake-email.com','$2b$10$5hQpgnHpTdF8miRhf1m1o.YzlPcvlh1hNWCJYthNGsBdx6l.j0hyu',NULL,NULL,NULL,NULL),('4db2a380-99f6-43b0-8335-20ce43a9a6b4@fake-email.com','$2b$10$Kh8Bow86JOxV8EJwUbbJJeOLer4ffvELT0Jyxm0LdZ.Ao49mz.dbu','Caden','Reinger','2023-08-06','985 Michele Mills'),('51e98403-e34c-4860-8da8-aed3dabc2c3d@fake-email.com','$2b$10$4lSCp3AM5WrGZ7lqk4etbeKTuS0B9dAhvPBt1yeXiBa.LDa38MrRC',NULL,NULL,NULL,NULL),('53c830b4-826a-43ab-9297-42f0c3ace7fa@fake-email.com','$2b$10$RfVVvCzsYzn7ba6/lbNWhelr9LaUIVqG.vfYc0HSKloXPEINWo5Xu','Finn','Parisian','2023-12-09','312 Powlowski Gardens'),('568ee74a-eaab-4308-a634-b903a9ab34f4@fake-email.com','$2b$10$vKdUb/jRru1ROsuaTf7bEOiydGg/TPEBwTFcvsLGV1eg0hThJgxn6',NULL,NULL,NULL,NULL),('579f4a4f-adf0-4efb-b548-77d249aee73a@fake-email.com','$2b$10$FhSqYBs/qeVfTzScQFV7feh.VbakyKI.3Va0UCgeJ1rC5HsS3qe4i',NULL,NULL,NULL,NULL),('581510bb-1e41-4726-a78f-c2bcb9b3dd93@fake-email.com','$2b$10$1WnvLVH6DtPbbiI//3w4Hums7q5BBGQtu3MEgEyOrMBaHwF6oOL2a',NULL,NULL,NULL,NULL),('5ee3e312-5dbb-41e7-9b4e-ae4523244216@fake-email.com','$2b$10$5J7vZHSviBEJrjiizxg16O/SQ5pAv4rGg9OHynM/aPRot//ld67u.',NULL,NULL,NULL,NULL),('652c3854-db4e-4f2b-9377-e699c04cb64e@fake-email.com','$2b$10$Q6HcW2CES9kbhywq8HMvIuJHnL0PI.rRpTPWs17uGru2.ioXlok1K',NULL,NULL,NULL,NULL),('6b3dcfa3-7e3e-4af6-a1b4-087bb2dc0ae1@fake-email.com','$2b$10$IduF5Cps3nJqm50tjDXJw.Y87HdcF0KrfMMbYsn..Mtbbf0UDpsF6',NULL,NULL,NULL,NULL),('6f5336e4-9229-4f2d-84c4-c4954e1df63f@fake-email.com','$2b$10$Qqf5PimTQF72dg.tQHFsWOQDXkg4bQKwJHXcMvvqd3dA/HPo.0zBK',NULL,NULL,NULL,NULL),('708bc568-1bc9-4edc-ac1b-d23206a8919b@fake-email.com','$2b$10$0sIiVBuJ8i1R0IL/41z8DeUXs0ld3cESIUHdQjVL7DjA6jp38Sws2',NULL,NULL,NULL,NULL),('72c1b7f1-249c-43b2-9107-350bae13887b@fake-email.com','$2b$10$MEgti9hHrp5jp1Dfdbwmq.fM6WWoT/TcPIM0KaoesLAMAcaBDe0lO',NULL,NULL,NULL,NULL),('7785e392-1eb9-4d66-b0e8-b28c9a56a028@fake-email.com','$2b$10$Ufzr1J5eFUaGv7jFJ.caQ.chrVK81q8ETY3zNP/Igu1CdgrenHBDG',NULL,NULL,NULL,NULL),('7a2d78b6-c0ae-4bee-8ac6-41fae796b010@fake-email.com','$2b$10$qGws4MsPCiNHP.sBdi2XuOdMAm3ctpDBVXk5wR/ax6a8YJTEU5d8S',NULL,NULL,NULL,NULL),('7fa3971d-8b99-4954-8b6d-1dd863ef812f@fake-email.com','$2b$10$syk2c7in9pBLDxPo3skKUOxknBDQzswDGYxFD0r1JsT9K8xlKDGbe','Solon','Parker','2023-07-10','518 Shanahan Bridge'),('8269551e-b40a-4c7b-a505-49bdb004273f@fake-email.com','$2b$10$2xzaXDLVcu.erIboD9xZ2e/DM19J/HhgkBTKq.HykIHmXCrlO0UIm','Chadrick','Rice','2024-01-01','654 Larkin Gardens'),('8d49c7ba-209c-480e-b0a4-d030d1e3eede@fake-email.com','$2b$10$tGPS5g.gP80lkvPeQRgvCOCISakR2A9uLKR605N1Cfny0Rela/plC','Nestor','Parisian','2023-08-31','304 Rosalyn Mission'),('986ef158-f3db-4cf0-af96-b9566ade690e@fake-email.com','$2b$10$Q7H/LVbWFMhgTz9ZQ1ScUevROELt6jpIB8lDP2BqooAziCnnzNTRm',NULL,NULL,NULL,NULL),('98b99a1c-7df6-4339-8418-444f85acb34c@fake-email.com','$2b$10$FODvZ/lW54bAzYXrkX4a6edPDByUOsvOz9VTWytjeY3cUK/ziU5F.','Tracy','Wyman','2024-02-06','79173 Weimann Lights'),('9d9cf5a1-0370-4e3e-835b-05a5148543f4@fake-email.com','$2b$10$QkntVfSES61l9XhF5m0H4eNchUq4fdEzWoCS/ebbecGnaT2kKRyva',NULL,NULL,NULL,NULL),('a5682b22-ce6b-4c05-af25-eba76404b853@fake-email.com','$2b$10$BNFW1Xcupi76vFLWMWLdRein7KZ2PWkXIaB5wjdE1HJ4lKCVg9/py',NULL,NULL,NULL,NULL),('a8abc3a0-50ef-4911-9367-c29ed9004e9f@fake-email.com','$2b$10$yR6OtCz4q4lYumGuVRG7c.QEyaHemN4bBT3.Dyzu4c7oYewgjhZRO',NULL,NULL,NULL,NULL),('a9c023af-c4a1-42f4-b475-d5c3ebae4bf0@fake-email.com','$2b$10$5baIRFIQKXTMaSsF44y9pOx2yatYV7KcOD5HGZvgqliBbfAGDWIam','Cecil','Christiansen','2023-08-31','3689 Lind Rest'),('aa79f940-5cb7-4199-a937-9e3b88a3f598@fake-email.com','$2b$10$TiOwdEVPgj1UA.DvE1pZ7Oy4e61zEovB4QFpRNtNd1phmdmn6sunm','Madisyn','Luettgen','2023-08-02','60177 Skiles Ports'),('ab9ad15e-b10f-4881-8709-d61feab178e8@fake-email.com','$2b$10$EObJ04ieQrL.Laol4400UeW7TntjAdmnBxtvinr3NIjoe15ab9YZO','Enrique','Davis','2023-12-03','61980 Sporer Squares'),('ac759f1f-0b00-476d-9ed7-f628c23135ef@fake-email.com','$2b$10$TUNA0tEft7x4GYZV7HS3ZeB.HQknC/iIJ37jYVPZNzPgCfMLb4kbS','Roselyn','Shanahan','2024-05-16','37556 Gerhold Squares'),('aca055c1-0989-4687-86cd-f2baeb2d5718@fake-email.com','$2b$10$q0hZdV9R7O7iybt9u7QTkONmuwIyzMNpJ3P88Ax3pQFqgtteUvvzm',NULL,NULL,NULL,NULL),('acd08c95-a0fe-42d9-b980-78e8f2d0a581@fake-email.com','$2b$10$sAFWXUaorbEBTgsQT8PM8.B.5xFm5q/5XXgd6ts46f.vszkx1Bkb2',NULL,NULL,NULL,NULL),('ad535719-4f91-4d87-a113-2ef7775ff971@fake-email.com','$2b$10$2naBeeCXDxhloSuJsWxFqOBql8MEru.twc3bkTthPlQXiHnfFOT4i','Adelia','Hoppe','2024-01-14','586 Orn Plains'),('b2a55df1-a0d3-4834-82ad-aa060af02dda@fake-email.com','$2b$10$myqlVK7O6VzS4Q2DyWc3N.8WeA9Snk75t7Yi57PyLBKXO3QWyuhqK','Bradford','Nitzsche','2023-09-27','7485 Lang Green'),('be67536f-271d-49d6-933e-ab663a123c8e@fake-email.com','$2b$10$9EZGnBV2gO/3uFetavoypuDVIC7yLQsE6iSFRzUp9yStpqL6Q9PIW','Lora','Schamberger','2024-03-16','73257 Johnny Fall'),('c22eb499-0bc2-481c-a810-65f5d448fe5b@fake-email.com','$2b$10$VJaLkLMMes74KfZyaBXtMe88XHh5iZ4L0Z.f5Uk0Vh5WhEc29W9L6','Jazlyn','Wilkinson','2024-04-16','19562 Pouros Cape'),('c5f48549-c0a6-4309-80a1-38e60e30510a@fake-email.com','$2b$10$098eLVWCEhZInaFq6kVlkOF1Hlm.EEsnN/onEGBgfIwvFKUmdeDz6',NULL,NULL,NULL,NULL),('c6579c55-dce3-4be8-b00b-5d5a47977f45@fake-email.com','$2b$10$R0iWVfXGoGd6x4f3lDzjHOCQE1GLASaa7kiUIsmxGyK228apPCOO2',NULL,NULL,NULL,NULL),('d11f77d2-a196-4375-9740-16e2ab7e2384@fake-email.com','$2b$10$ktj4qDZ.EKdOt0RMSZhKQOqDkLs/lOC/vzgPQX5DgbXzHmI.wVq9a',NULL,NULL,NULL,NULL),('d19055e4-552a-4cd1-8c6b-f054b0f0b056@fake-email.com','$2b$10$pPKO.ITkQA401RKk0fGrAu3hSd1KnIRHcNgiC4AUFJeJFfiyJHHSq',NULL,NULL,NULL,NULL),('d8a60db9-b642-4d3f-a455-351ff013ea0f@fake-email.com','$2b$10$b.5aO/Rs7hJa9o9hH.omPeGkcV/WV0wX4hAHoToGYS1fbcsOzbvgu','Leonor','Hyatt','2023-06-03','73887 Zechariah Oval'),('d8d1ee84-c90d-46d7-9c1a-5eec1a29ad86@fake-email.com','$2b$10$3EJwK2/KXpiko6J3S6H8muwfO9zb0Fg7KxX0ZtH7n293I9Egz2TVu','Rowena','Kub','2023-08-22','74529 Ryan Mountains'),('d9284b93-baed-4d7a-9453-528c0925342f@fake-email.com','$2b$10$OpGIWKu9fXnGNn2XAfO1s.pmhPVpdAQJTq50hNyEOmGvryP/OZ2iC',NULL,NULL,NULL,NULL),('d96b388b-bd82-499f-b239-555113878afa@fake-email.com','$2b$10$ZJAis7k2yT/cdiSR7SYy/Ot5zE399s5BcozCGAV2m1UvtxNwRR59i',NULL,NULL,NULL,NULL),('db005a20-224b-4f13-a364-e19cd10a26a5@fake-email.com','$2b$10$xtwjGf1B.xWXYA72V4pgJuZXn6.wR0k8Zy2PrTe.ueuzQICM9nCNm',NULL,NULL,NULL,NULL),('e1db11c9-dde0-4508-b99f-2cfd1b05e3ce@fake-email.com','$2b$10$ng4swBKJ.uGVKIuMOaejNurmWjPymkfRHBkChzRHGJwuy6GOwLAua',NULL,NULL,NULL,NULL),('e2a6aedb-772e-4e36-ae1f-7596be5c5a12@fake-email.com','$2b$10$pU3M2KzdRQ3ryjc1hqbYnuyJQGgokkixSZi1WEmwBDPNKud57u5WO','Herman','Barton','2023-07-26','26128 Ericka Lake'),('ed98f67e-e3b6-4bf8-8398-c560d3211b9b@fake-email.com','$2b$10$lQde1pnz.FZobK/qnJOKbejjc/XGTDn0px/4DmiPuf0rg9yz1AQoW','Darby','Boyer','2023-10-28','2192 Roob Trail'),('f4a98a56-21d3-470f-b589-bd385ea96ff3@fake-email.com','$2b$10$Sw0DgiLCnW6FJnB3hRgMgesgubfqYgXqSXP.NpW0L5ApsrOvj/Ekm','Bulah','Fadel','2024-05-18','33774 Kaya Flat'),('f58e0b16-e166-471c-aa91-7f3a31c4c5bb@fake-email.com','$2b$10$J94viSa17teCOxB0Ss8XJOV00T9U.3XYcHYy0tUTOfg/FUUxBMJAu',NULL,NULL,NULL,NULL),('fb185073-cfde-495b-81f4-b132e992bf9c@fake-email.com','$2b$10$Xra64W0XfX0JwZxn7gAj/uW.634YNPujW2mrH.FFQeLf1/N6zeUUK','Nayeli','Sauer','2024-01-21','9229 Katherine Loop'),('fb2ced35-f7e3-40bd-9943-fb66665bfe53@fake-email.com','$2b$10$.IyIWaTE1d7tUig53nMvcu7kK7oF0IdnvpEa1t0HhRufPrQTXIBXK',NULL,NULL,NULL,NULL),('fc9a04d3-275f-4d58-8183-dc3e1c7f8cb2@fake-email.com','$2b$10$KhWflb7Y/9FJ5C6XX5q.EOl5M2fqlQuVlaHBkRQB773bpk/x8Wsdu','Antwon','O\'Reilly','2023-11-14','296 Grimes View'),('test@test.com','$2b$10$NuLLsSZkzcjX02rhC/2NqOh7bBn/qwOkFBWqHdfwBcKb7YBufg286','test','test2','2024-05-09','test 2');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -94,4 +202,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-05-21 16:47:56
+-- Dump completed on 2024-05-27 22:18:26
