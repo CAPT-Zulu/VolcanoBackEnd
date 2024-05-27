@@ -237,6 +237,97 @@
             "example": "Invalid input: dob must be a date in the past."
           }
         }
+      },
+      "NoFavoritesFound": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": "true"
+          },
+          "message": {
+            "type": "string",
+            "example": "No favorites found for user test@example.com"
+          }
+        }
+      },
+      "VolcanoAlreadySaved": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": "true"
+          },
+          "message": {
+            "type": "string",
+            "example": "Volcano with ID 1 is already saved by user test@example.com"
+          }
+        }
+      },
+      "VolcanoNotSaved": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": "true"
+          },
+          "message": {
+            "type": "string",
+            "example": "Volcano with ID 1 not saved by user test@example.com"
+          }
+        }
+      },
+      "CommentTooLong": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": "true"
+          },
+          "message": {
+            "type": "string",
+            "example": "Comment is too long (255 characters max)"
+          }
+        }
+      },
+      "CommentInappropriate": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": "true"
+          },
+          "message": {
+            "type": "string",
+            "example": "Comment contains inappropriate or harmful content"
+          }
+        }
+      },
+      "CommentNotFound": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": "true"
+          },
+          "message": {
+            "type": "string",
+            "example": "Comment with ID 1 not found"
+          }
+        }
+      },
+      "UserReportedComment": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "boolean",
+            "example": "true"
+          },
+          "message": {
+            "type": "string",
+            "example": "User test@example.com has already reported comment with ID 1"
+          }
+        }
       }
     }
   },
@@ -522,6 +613,1013 @@
             }
           }
         }
+      }
+    },
+    "/volcanoes/random": {
+      "get": {
+        "tags": [
+          "Data"
+        ],
+        "description": "Returns a list of random volcanoes. The amount of volcanoes returned can be specified with the `amount` query parameter. The maximum amount of volcanoes that can be returned is 10.",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "query",
+            "description": "Amount of random volcanoes to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of objects containing id, name, country, region and subregion properties. An example of one object in the array is shown below.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Abu"
+                      },
+                      "country": {
+                        "type": "string",
+                        "example": "Japan"
+                      },
+                      "region": {
+                        "type": "string",
+                        "example": "Japan, Taiwan, Marianas"
+                      },
+                      "subregion": {
+                        "type": "string",
+                        "example": "Honshu"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid amount parameter. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid value for amount. Allowed numbers are between 1-10"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/volcanoes/adv": {
+      "get": {
+        "tags": [
+          "Data"
+        ],
+        "description": "Returns a list of volcanoes that match the provided query parameters. All query parameters are optional, but at least one must be provided.",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Name of volcano",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Name of country",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "description": "Volcano region",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "last_eruption",
+            "in": "query",
+            "description": "Year of last eruption",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "summit",
+            "in": "query",
+            "description": "Summit height in meters",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "elevation",
+            "in": "query",
+            "description": "Elevation in feet",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of objects containing id, name, country, region and subregion properties. An example of one object in the array is shown below.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Abu"
+                      },
+                      "country": {
+                        "type": "string",
+                        "example": "Japan"
+                      },
+                      "region": {
+                        "type": "string",
+                        "example": "Japan, Taiwan, Marianas"
+                      },
+                      "subregion": {
+                        "type": "string",
+                        "example": "Honshu"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "example": "true"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Queries are required."
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "example": "true"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Invalid queries provided. Allowed queries: name, country, region, last_eruption, summit, elevation"
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "example": "true"
+                        },
+                        "message": {
+                          "type": "string",
+                          "example": "Queries cannot be empty."
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/volcano/{volcanoID}/comments": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "description": "Returns a list comments associated with the volcano ID. Requires no authentication.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of comment IDs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "example": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano ID is a required parameter"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Volcano with the provided ID not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 1 not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Comments"
+        ],
+        "description": "Posts a comment to a volcano. Requires authentication.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Comment to be posted.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "comment": {
+                    "type": "string",
+                    "example": "This is a comment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comment posted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Comment posted"
+                    },
+                    "commentID": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID or comment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "The Volcano ID and the comment are required parameters"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingAuthHeader"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Volcano with the provided ID not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 1 not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/volcano/{volcanoID}/comments/{commentID}": {
+      "put": {
+        "tags": [
+          "Comments"
+        ],
+        "description": "Updates a comment. Requires authentication.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "commentID",
+            "in": "path",
+            "description": "ID of the comment",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Updated comment.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "comment": {
+                    "type": "string",
+                    "example": "This is an updated comment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comment updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Comment updated"
+                    },
+                    "commentID": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID or comment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "The comment ID and the comment are required parameters"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingAuthHeader"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. User is not the author of the comment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User is not the author of the comment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Comment with the provided ID not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Comment with ID 1 not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Comments"
+        ],
+        "description": "Deletes a comment. Requires authentication.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "commentID",
+            "in": "path",
+            "description": "ID of the comment",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Comment deleted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing comment ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "The comment ID is a required parameter"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingAuthHeader"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. User is not the author of the comment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User is not the author of the comment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Comment with the provided ID not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Comment with ID 1 not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/volcano/{volcanoID}/comments/{commentID}/report": {
+      "post": {
+        "tags": [
+          "Comments"
+        ],
+        "description": "Reports a comment. Requires authentication.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "commentID",
+            "in": "path",
+            "description": "ID of the comment",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Report submitted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Report submitted"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing comment ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Comment ID is an required parameter"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingAuthHeader"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. User cannot report their own comment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User cannot report their own comment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Comment with the provided ID not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Comment with ID 1 not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User has already reported this comment.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "User test@example.com has already reported comment with ID 1"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/volcano/{volcanoID}/eruptions": {
+      "get": {
+        "tags": [
+          "Eruptions"
+        ],
+        "description": "Gets all eruption guesses for a volcano. Requires no authentication.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An object containing the count, average, median, min, and max of the eruption guesses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "description": "Number of eruption guesses",
+                      "example": 10
+                    },
+                    "average": {
+                      "type": "number",
+                      "description": "Average eruption guess",
+                      "example": 1990.5
+                    },
+                    "median": {
+                      "type": "integer",
+                      "description": "Median eruption guess",
+                      "example": 1990
+                    },
+                    "min": {
+                      "type": "integer",
+                      "description": "Minimum eruption guess",
+                      "example": 1980
+                    },
+                    "max": {
+                      "type": "integer",
+                      "description": "Maximum eruption guess",
+                      "example": 2000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano ID is a required parameter"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Eruptions"
+        ],
+        "description": "Submits or updates an eruption guess for a volcano. Requires authentication.",
+        "parameters": [
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Eruption guess to be submitted.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "guessYear": {
+                    "type": "integer",
+                    "example": 1990
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Eruption guess submitted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Eruption year guess 1990 submitted for volcano with ID 1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing volcano ID or guess year.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano ID and eruption year are required parameters"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingAuthHeader"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Volcano with the provided ID not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 1 not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/user/register": {
@@ -918,124 +2016,12 @@
         }
       }
     },
-    "/me": {
-      "get": {
-        "tags": [
-          "Administration"
-        ],
-        "description": "A route to assist in automating some of the marking process for this assignment.",
-        "responses": {
-          "200": {
-            "description": "An object containing your name and student number.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "example": "Mike Wazowski"
-                    },
-                    "student_number": {
-                      "type": "string",
-                      "example": "n1234567"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/volcanoes/random": {
-      "get": {
-        "tags": [
-          "Data"
-        ],
-        "description": "Returns a random volcano from the database.",
-        "responses": {
-          "200": {
-            "description": "Returns a random volcano. An example of the object is shown below.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "number",
-                      "example": 10
-                    },
-                    "name": {
-                      "type": "string",
-                      "example": "Akita-Komaga-take"
-                    },
-                    "country": {
-                      "type": "string",
-                      "example": "Japan"
-                    },
-                    "region": {
-                      "type": "string",
-                      "example": "Japan, Taiwan, Marianas"
-                    },
-                    "subregion": {
-                      "type": "string",
-                      "example": "Honshu"
-                    },
-                    "last_eruption": {
-                      "type": "string",
-                      "example": "Unknown"
-                    },
-                    "summit": {
-                      "type": "number",
-                      "example": "1637"
-                    },
-                    "elevation": {
-                      "type": "number",
-                      "example": "5369"
-                    },
-                    "latitude": {
-                      "type": "string",
-                      "example": "39.8333"
-                    },
-                    "longitude": {
-                      "type": "string",
-                      "example": "140.8333"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No volcanoes found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "No volcanoes found."
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/user/{email}/favorites": {
       "get": {
         "tags": [
           "Favorites"
         ],
-        "description": "Returns a list of volcanoes that have been saved to the favorites of the user with the provided email. The email path parameter is required and must be an email that has been registered. This route also requires the user to be authenticated. To be authenticated, a valid JWT token must be sent in the header of the request. To test this using Swagger, click the green 'Authorize' button at the top of this page to enter your JWT token. A JWT token can be obtained by logging in.",
+        "description": "Returns a list of a users favorited volcanos. Requires Authentication",
         "parameters": [
           {
             "name": "email",
@@ -1054,7 +2040,7 @@
         ],
         "responses": {
           "200": {
-            "description": "An array of favorite volcanoes. An example of the object is shown below.",
+            "description": "An array of volcano objects.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1101,22 +2087,6 @@
                       "longitude": {
                         "type": "string",
                         "example": "131.6000"
-                      },
-                      "population_5km": {
-                        "type": "number",
-                        "example": "3597"
-                      },
-                      "population_10km": {
-                        "type": "number",
-                        "example": "9594"
-                      },
-                      "population_30km": {
-                        "type": "number",
-                        "example": "117805"
-                      },
-                      "population_100km": {
-                        "type": "number",
-                        "example": "4071152"
                       }
                     }
                   }
@@ -1125,7 +2095,7 @@
             }
           },
           "400": {
-            "description": "Missing user email",
+            "description": "Missing user email.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1133,7 +2103,7 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "example": true
+                      "example": "true"
                     },
                     "message": {
                       "type": "string",
@@ -1145,44 +2115,11 @@
             }
           },
           "401": {
-            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
+            "description": "Unauthorized.",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/MissingAuthHeader"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TokenExpired"
-                    },
-                    {
-                      "$ref": "#/components/schemas/InvalidJWT"
-                    },
-                    {
-                      "$ref": "#/components/schemas/MalformedAuthHeader"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No favorites found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "No favorites found for user example@example.com"
-                    }
-                  }
+                  "$ref": "#/components/schemas/MissingAuthHeader"
                 }
               }
             }
@@ -1193,9 +2130,20 @@
         "tags": [
           "Favorites"
         ],
-        "description": "Saves a volcano to the favorites of the currently authenticated user. The volcano ID must be provided in the request body. This route requires the user to be authenticated. To be authenticated, a valid JWT token must be sent in the header of the request. To test this using Swagger, click the green 'Authorize' button at the top of this page to enter your JWT token. A JWT token can be obtained by logging in.",
+        "description": "Adds a volcano to the users favorites. Requires Authentication",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "Email address of a registered user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
-          "description": "The ID of the volcano to save.",
+          "description": "Volcano ID to be added to favorites.",
           "required": true,
           "content": {
             "application/json": {
@@ -1204,32 +2152,21 @@
                 "properties": {
                   "volcanoID": {
                     "type": "integer",
-                    "example": 10
+                    "example": 1
                   }
                 }
               }
             }
           }
         },
-        "parameters": [
-          {
-            "name": "email",
-            "in": "path",
-            "description": "Email address of a registered user",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "security": [
           {
             "bearerAuth": []
           }
         ],
         "responses": {
-          "201": {
-            "description": "Volcano saved to favorites",
+          "200": {
+            "description": "Volcano added to favorites.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1237,7 +2174,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Volcano with ID 10 saved to favorites"
+                      "example": "Volcano with ID 1 saved to favorites"
                     }
                   }
                 }
@@ -1245,67 +2182,7 @@
             }
           },
           "400": {
-            "description": "Missing volcano ID or user email. Click on 'Schema' below to see the possible error responses.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "type": "object",
-                      "properties": {
-                        "error": {
-                          "type": "boolean",
-                          "example": true
-                        },
-                        "message": {
-                          "type": "string",
-                          "example": "Volcano ID and user email are required parameters"
-                        }
-                      }
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "error": {
-                          "type": "boolean",
-                          "example": true
-                        },
-                        "message": {
-                          "type": "string",
-                          "example": "Volcano ID is a required parameter"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/MissingAuthHeader"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TokenExpired"
-                    },
-                    {
-                      "$ref": "#/components/schemas/InvalidJWT"
-                    },
-                    {
-                      "$ref": "#/components/schemas/MalformedAuthHeader"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Volcano not found",
+            "description": "Missing volcano ID.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1313,11 +2190,41 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "example": true
+                      "example": "true"
                     },
                     "message": {
                       "type": "string",
-                      "example": "Volcano with ID 10 not found"
+                      "example": "Volcano ID is an required parameter"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MissingAuthHeader"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Volcano with the provided ID not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "example": "true"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Volcano with ID 1 not found"
                     }
                   }
                 }
@@ -1325,7 +2232,7 @@
             }
           },
           "409": {
-            "description": "Volcano already saved",
+            "description": "Volcano with the provided ID is already saved by the user.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1333,11 +2240,11 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "example": true
+                      "example": "true"
                     },
                     "message": {
                       "type": "string",
-                      "example": "Volcano with ID 10 is already saved by user example@example.com"
+                      "example": "Volcano with ID 1 is already saved by user test@example.com"
                     }
                   }
                 }
@@ -1350,17 +2257,8 @@
         "tags": [
           "Favorites"
         ],
-        "description": "Removes a volcano from the favorites of the currently authenticated user. The volcano ID must be provided as a path parameter. This route requires the user to be authenticated. To be authenticated, a valid JWT token must be sent in the header of the request. To test this using Swagger, click the green 'Authorize' button at the top of this page to enter your JWT token. A JWT token can be obtained by logging in.",
+        "description": "Deletes a volcano from the users favorites. Requires Authentication",
         "parameters": [
-          {
-            "name": "volcanoID",
-            "in": "path",
-            "description": "ID of the volcano to remove from favorites",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
           {
             "name": "email",
             "in": "path",
@@ -1369,6 +2267,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "volcanoID",
+            "in": "path",
+            "description": "ID of the volcano to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "security": [
@@ -1378,7 +2285,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Volcano removed from favorites",
+            "description": "Volcano removed from favorites.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1386,70 +2293,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "example": "Volcano with ID 10 removed from favorites"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing volcano ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano ID is a required parameter"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/MissingAuthHeader"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TokenExpired"
-                    },
-                    {
-                      "$ref": "#/components/schemas/InvalidJWT"
-                    },
-                    {
-                      "$ref": "#/components/schemas/MalformedAuthHeader"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Volcano not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano with ID 10 not found"
+                      "example": "Volcano with ID 1 removed from saved volcanoes"
                     }
                   }
                 }
@@ -1459,516 +2303,27 @@
         }
       }
     },
-    "/volcano/{volcanoID}/eruption": {
+    "/me": {
       "get": {
         "tags": [
-          "Eruption Guesses"
+          "Administration"
         ],
-        "description": "Returns a list of all eruption year guesses for a volcano, specified by its ID in the path parameter. The volcano ID is required.",
-        "parameters": [
-          {
-            "name": "volcanoID",
-            "in": "path",
-            "description": "ID of the volcano",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
+        "description": "A route to assist in automating some of the marking process for this assignment.",
         "responses": {
           "200": {
-            "description": "An array of eruption year guesses. An example of the array is shown below.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "eruptionYear": {
-                        "type": "integer",
-                        "example": 2024
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing volcano ID",
+            "description": "An object containing your name and student number.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
+                    "name": {
                       "type": "string",
-                      "example": "Volcano ID is a required parameter"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No eruption guesses found for volcano",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
+                      "example": "Mike Wazowski"
                     },
-                    "message": {
+                    "student_number": {
                       "type": "string",
-                      "example": "No eruption guesses found for volcano with ID 1"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Eruption Guesses"
-        ],
-        "description": "Submits an eruption year guess for a specific volcano, specified by its ID in the path parameter. The volcano ID and the guess year (in the request body) are required. This route requires the user to be authenticated - a valid JWT token must be sent in the header of the request. To test this using Swagger, click the green 'Authorize' button at the top of this page to enter your JWT token. A JWT token can be obtained by logging in.",
-        "parameters": [
-          {
-            "name": "volcanoID",
-            "in": "path",
-            "description": "ID of the volcano",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "The eruption year guess.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "guessYear": {
-                    "type": "integer",
-                    "example": 2024
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Eruption year guess submitted.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Eruption year guess 2024 submitted for volcano with ID 1"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing volcano ID or guess year",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano ID and eruption year are required parameters"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/MissingAuthHeader"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TokenExpired"
-                    },
-                    {
-                      "$ref": "#/components/schemas/InvalidJWT"
-                    },
-                    {
-                      "$ref": "#/components/schemas/MalformedAuthHeader"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Volcano not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano with ID 1 not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/volcano/{volcanoID}/comment": {
-      "get": {
-        "tags": [
-          "comments"
-        ],
-        "description": "Returns a list of comment URLs for a specific volcano, identified by its ID in the path parameter. The volcano ID is required.",
-        "parameters": [
-          {
-            "name": "volcanoID",
-            "in": "path",
-            "description": "ID of the volcano",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "An array of comment URLs. An example of the first element in the array is shown below.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "commentUrl": {
-                        "type": "string",
-                        "example": "https://example.com/comment.jpg"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing volcano ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano ID is a required parameter"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No comments found for volcano",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "No comments found for volcano with ID 1"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "comments"
-        ],
-        "description": "Uploads an comment for a volcano, specified by ID in the path parameter. Requires authentication (JWT token) and the comment URL in the request body.",
-        "parameters": [
-          {
-            "name": "volcanoID",
-            "in": "path",
-            "description": "ID of the volcano",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "description": "The URL of the comment to upload.",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "commentUrl": {
-                    "type": "string",
-                    "example": "https://example.com/comment.jpg"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "comment uploaded successfully.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "comment posted"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing volcano ID or comment URL",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano ID, comment URL and user email are required parameters"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/MissingAuthHeader"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TokenExpired"
-                    },
-                    {
-                      "$ref": "#/components/schemas/InvalidJWT"
-                    },
-                    {
-                      "$ref": "#/components/schemas/MalformedAuthHeader"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Volcano not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano with ID 1 not found"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "comments"
-        ],
-        "description": "Flags an comment for removal, specified by its ID. Requires authentication (JWT token). If an comment receives three flags, it will be automatically deleted from the database.",
-        "parameters": [
-          {
-            "name": "volcanoID",
-            "in": "path",
-            "description": "ID of the volcano",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "commentID",
-            "in": "path",
-            "description": "ID of the comment",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "comment flagged successfully (No Content)."
-          },
-          "400": {
-            "description": "Missing parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano ID, comment ID, and reporter email are required parameters"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/MissingAuthHeader"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TokenExpired"
-                    },
-                    {
-                      "$ref": "#/components/schemas/InvalidJWT"
-                    },
-                    {
-                      "$ref": "#/components/schemas/MalformedAuthHeader"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "comment not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "comment with ID 1 for volcano with ID 1 not found"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "User already reported this comment",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "User example@example.com has already reported comment with ID 1"
+                      "example": "n1234567"
                     }
                   }
                 }
