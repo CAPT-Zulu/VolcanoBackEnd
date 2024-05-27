@@ -194,7 +194,7 @@ class commentDAO extends VolcanoDAO {
             // Check if the user has already reported this comment
             const alreadyReported = await this.reports_db()
                 .where({ commentId, reporterEmail: this.authenticated.email });
-            if (alreadyReported) throw new HttpException(409, `User ${this.authenticated.email} has already reported comment with ID ${commentId}`);
+            if (alreadyReported.length > 0) throw new HttpException(409, `User ${this.authenticated.email} has already reported comment with ID ${commentId}`);
 
             // Check if the user is the author of the comment
             if (commentExists.userEmail === this.authenticated.email) throw new HttpException(403, 'User cannot report their own comment');
