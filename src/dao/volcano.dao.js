@@ -40,19 +40,28 @@ class VolcanoDAO {
     async getVolcanoesByQuery(queries) {
         try {
             // If queries are not provided, throw an error
-            if (!queries) throw new HttpException(400, 'Queries are required.');
+            if (!queries || Object.keys(queries).length === 0) throw new HttpException(400, 'Queries are required.');
 
             // Ensure that all queries are valid
-            if (!Object.keys(queries).every(query => allowedQueries.includes(query))) {
-                throw new HttpException(400, 'Invalid queries provided. Allowed queries: ' + allowedQueries.join(', '));
+            if (!Object.keys(queries).every(query => this.allowedQueries.includes(query))) {
+                throw new HttpException(400, 'Invalid queries provided. Allowed queries: ' + this.allowedQueries.join(', '));
             }
 
-            // Create a query to get volcanoes by custom queries
-            const query = this.db.select(this.nonAuthFields)
-                .where(queries);
+            // Ensure queries are not empty
+            if (!Object.keys(queries).every(query => queries[query])) {
+                throw new HttpException(400, 'Queries cannot be empty.');
+            }
 
-            // Return the query
-            return await query;
+            // Retrieve the volcanoes by custom queries using whereLike for each query
+            const volcanoes = await this.db.select(this.nonAuthFields)
+                .where(builder => {
+                    Object.keys(queries).forEach(query => {
+                        builder.where(query, 'like', `%${queries[query]}%`);
+                    });
+                });
+            
+            // Return the volcanoes
+            return volcanoes;
         } catch (err) {
             // Throw an error if failed to retrieve volcanoes by custom queries
             throw new HttpException(err.status || 500, err.message || 'Failed to get volcanoes by custom queries');
