@@ -63,28 +63,30 @@ class VolcanoDAO {
         }
     }
 
-    // Get a random volcano
-    async getRandomVolcano() {
+    // Get random volcanos
+    async getRandomVolcanos(count) {
         try {
+            // Check if count was provided
+            if (!count) throw new HttpException(400, 'Count is a required query parameter.');
+
+            // Check if count is within the allowed range (1-10)
+            if (count < 1 || count > 10) throw new HttpException(400, 'Invalid value for count. Allowed values: 1-10');
+
             // Get the total number of volcanoes
             const totalVolcanoes = await this.db.count('id').first();
 
-            // If no volcanoes are found, return an error
-            if (!totalVolcanoes) throw new HttpException(404, 'No volcanoes found.');
-
             // Generate a random number between 1 and the total number of volcanoes
-            const random = Math.floor(Math.random() * totalVolcanoes.count) + 1;
+            const randoms = [...Array(count).keys()].map(() => Math.floor(Math.random() * totalVolcanoes.count) + 1);
 
-            // Retrieve a random volcano
-            const randomVolcano = await this.db.select(this.nonAuthFields)
-                .where('id', random)
-                .first();
+            // Retrieve the random volcanoes
+            const randomVolcanoes = await this.db.select(this.nonAuthFields)
+                .whereIn('id', randoms);
 
-            // If no random volcano is found, return an error
-            if (!randomVolcano) throw new HttpException(404, 'No random volcano found.');
+            // If no random volcanoes are found, return an error
+            if (!randomVolcanoes.length) throw new Error('No random volcanoes found.'); // Will be passed as an 500 error
 
-            // Return the random volcano
-            return randomVolcano;
+            // Return the random volcanoes
+            return randomVolcanoes;
         } catch (err) {
             // Throw an error if failed to retrieve a random volcano
             throw new HttpException(err.status || 500, err.message || 'Failed to get random volcano');

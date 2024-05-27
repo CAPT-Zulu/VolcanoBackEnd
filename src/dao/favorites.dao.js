@@ -9,7 +9,7 @@ class FavoritesDAO {
         // Assign authenticated status to the class
         this.authenticated = authenticated;
         // Mount the VolcanoDAO and UserDAO
-        this.volcanoDAO = new VolcanoDAO(db, authenticated); // Create a new instance of the VolcanoDAO
+        this.volcanoDAO = new VolcanoDAO(db, false); // Create a new instance of the VolcanoDAO without authentication (To prevent getting all fields)
         this.userDAO = new UserDAO(db, authenticated); // Create a new instance of the UserDAO
     }
 

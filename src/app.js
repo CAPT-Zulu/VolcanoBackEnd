@@ -86,3 +86,6 @@ module.exports = app;
 // TODO:
 // - Finish custom functions
 // - Finish custom Swagger docs
+
+// Questions:
+// - Is rate limiting and maxing number of responses out of scope?

@@ -1,11 +1,12 @@
 const router = require("express").Router();
 var createError = require('http-errors')
+const authenticateToken = require('../../middleware/auth.middleware');
 var VolcanoDAO = require('../../dao/volcano.dao');
 
 // Volcanoes route middleware
 router.use((req, res, next) => {
     // Create a new instance of VolcanoDAO and attach it to the request object
-    req.volcanoDAO = new VolcanoDAO(req.db, req.user);
+    req.volcanoDAO = new VolcanoDAO(req.db, false);
     next();
 });
 
@@ -33,40 +34,20 @@ router.get('/', async (req, res, next) => {
     }
 });
 
-// Get Saved Volcanoes Route
-router.get("/saved", async (req, res, next) => {
-    try {
-        // Check if user is authenticated
-        if (req.user) {
-            // Get user email
-            const userEmail = req.user.email;
-
-            // Attempt to get saved volcanoes
-            const savedVolcanoes = await req.volcanoDAO.getSavedVolcanoes(userEmail);
-
-            // Return saved volcanoes with 200 status code
-            res.status(200).json(savedVolcanoes);
-        } else {
-            // Return an error if user is not authenticated
-            return next(createError(401, "Unauthorized"));
-        }
-    } catch (err) {
-        // Return an error if failed to get saved volcanoes
-        next(createError(err.status || 500, err.message || 'Failed to get saved volcanoes'));
-    }
-});
-
 // Get Random Volcano Route
 router.get("/random", async (req, res, next) => {
     try {
-        // Attempt to get random volcano
-        const randomVolcano = await req.volcanoDAO.getRandomVolcano();
+        // Get count of volcanoes passed in the request
+        const count = req.query.count;
 
-        // Return random volcano with 200 status code
-        res.status(200).json(randomVolcano);
+        // Attempt to get random volcano
+        const randomVolcanos = await req.volcanoDAO.getRandomVolcanos(count);
+
+        // Return random volcanos with 200 status code
+        res.status(200).json(randomVolcanos);
     } catch (err) {
         // Return an error if failed to get random volcano
-        next(createError(err.status || 500, err.message || 'Failed to get random volcano'));
+        next(createError(err.status || 500, err.message || 'Failed to get random volcanos'));
     }
 });
 
