@@ -84,8 +84,9 @@ httpsServer.listen(process.env.PORT, () => {
 module.exports = app;
 
 // TODO:
-// - Finish custom functions
-// - Finish custom Swagger docs
+// - Final test and confirmation of swagger docs / routes / errors / schemas
+// - Dump sql and get azure server running on startup
+// - cry
 
 // Questions:
 // - Is rate limiting and maxing number of responses out of scope?
