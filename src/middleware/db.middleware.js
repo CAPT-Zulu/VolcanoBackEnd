@@ -1,11 +1,10 @@
 const knex = require("knex");
-const knexfile = require("../../knexfile");
-const db = knex(knexfile);
+const knexFile = require("../../knexfile");
 
 // Knex middleware to attach the db object to the request object
 function dbMiddleware(req, res, next) {
     // Attach the db object to the request object
-    req.db = db;
+    req.db = knex(knexFile);
     next();
 }
 

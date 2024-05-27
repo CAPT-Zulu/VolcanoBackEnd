@@ -1,90 +1,92 @@
 // --------------------- Import Modules ---------------------
 // General
-const createError = require('http-errors');
 const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-const helmet = require('helmet');
+const createError = require('http-errors');
 const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./docs/swagger.docs.json');
-const cors = require('cors');
 const fs = require('fs');
 const https = require('https');
 // Routes
-const countriesRouter = require('./routes/countries.routes');
-const volcanoesRouter = require('./routes/volcanoes.routes');
-const volcanoRouter = require('./routes/volcano.routes');
-const userRouter = require('./routes/user.routes');
-const AdministrationRouter = require('./routes/me.routes');
+const swaggerDocument = require('./docs/swagger.docs.json');
+const countriesRouter = require('./routes/countries');
+const volcanoesRouter = require('./routes/volcanoes');
+const volcanoRouter = require('./routes/volcano');
+const userRouter = require('./routes/user');
+const meRouter = require('./routes/me');
 // Middleware
 const dbMiddleware = require('./middleware/db.middleware');
-const authenticateToken = require('./middleware/auth.middleware');
+const cors = require('cors');
+const helmet = require('helmet');
+const logger = require('morgan');
 
 
 // --------------------- App ---------------------
 const app = express();
-app.set('views', path.join(__dirname, 'views')); // Set the views directory
-app.set('view engine', 'jade'); // Set the view engine to Jade
+
 
 // --------------------- HTTPS ---------------------
 const httpsOptions = {
   key: fs.readFileSync(process.env.PRIVATE_KEY_PATH),
   cert: fs.readFileSync(process.env.CERTIFICATE_PATH)
 };
+const httpsServer = https.createServer(httpsOptions, app);
+
 
 // --------------------- Middleware ---------------------
 app.use(dbMiddleware); // Attach Knex instance to the request object
 app.use(cors()); // Enable CORS (Cross-Origin Resource Sharing
 app.use(helmet()); // Security middleware
-app.use(logger('dev')); // Log HTTP requests
+app.use(logger('dev')); // Logging middleware, logs requests to the console
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: false })); // Parse URL-encoded request bodies
-app.use(cookieParser()); // Parse cookie headers
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from /public
-
 
 // --------------------- Routes ---------------------
-// Swagger Docs
-app.use('/', swaggerUi.serve)
-app.get('/', swaggerUi.setup(swaggerDocument)); // Docs route
-// Data API
-app.use('/countries', countriesRouter); // Countries routes
-app.use('/volcanoes', volcanoesRouter); // Volcanoes routes
-app.use('/volcano', volcanoRouter); // Volcano routes
-// Authentication API
-app.use('/user', userRouter); // User routes
-// Profile API
-app.use('/profile', authenticateToken, userRouter); // Profile route
-// Administration API
-app.use('/me', AdministrationRouter); // Administration route
+// Swagger Docs page
+app.use('/', swaggerUi.serve) // Swagger served at root
+app.get('/', swaggerUi.setup(swaggerDocument)); // Swagger document
+
+// API Routes
+app.use('/countries', countriesRouter); // Countries API router
+app.use('/volcanoes', volcanoesRouter); // Volcanoes API router
+app.use('/volcano/:volcanoID', volcanoRouter); // Volcano API router
+app.use('/user', userRouter); // User API router
+app.use('/me', meRouter); // Me router, used for assessment purposes (Provides my information)
+
 // 404 Error
-app.use(function (req, res, next) { next(createError(404, 'Not Found')); }); // 404 error, forwarded to error handler
+app.use((req, res, next) => { next(createError(404, 'Not Found')); }); // 404 error, forwarded to error handler
 
 
 // --------------------- Error Handling ---------------------
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   // Set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // Render the error page (or send JSON response for API errors)
-  res.status(err.status || 500);
-  res.json({ error: true, message: err.message })
+  // If the error is internal or unknown send a 500 error
+  if (err.status === 500 || err.status === undefined) {
+    // Log the error
+    console.error(err);
+    // Send JSON response for API errors
+    res.status(500);
+    res.json({ error: true, message: 'Internal server error', debug: err.message }); // Don't send server side errors to the client
+  } else {
+    // Render the error page
+    res.status(err.status);
+    res.json({ error: true, message: err.message })
+  }
 });
 
+
 // --------------------- Server ---------------------
-https.createServer(httpsOptions, app).listen(process.env.PORT, () => {
+httpsServer.listen(process.env.PORT, () => {
   console.log(`HTTPS Server running on port ${process.env.PORT}`);
 });
 
 module.exports = app;
 
 // TODO:
-// - Custom functions
-// - Custom Swagger docs
+// - Final test and confirmation of swagger docs / routes / errors / schemas
+// - Dump sql and get azure server running on startup
+// - cry
 
-// Nginx?
-// sql database dump
-// Server start up auto
-// Port forwarding
+// Questions:
+// - Is rate limiting and maxing number of responses out of scope?

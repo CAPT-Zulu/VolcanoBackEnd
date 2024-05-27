@@ -1,23 +1,23 @@
 const HttpException = require('../exceptions/HttpException');
 const bcrypt = require('bcrypt');
-const moment = require('moment');
 
 // User Data Access Object
 class UserDAO {
-    constructor(db) {
-        // Attach the Knex instance to the DAO
-        this.db = db;
-        // Define non restricted fields when user is authenticated
+    constructor(db, authenticated = false) {
+        // Assign the db object to the class
+        this.db = () => db.table('users');
+        // Assign authenticated status to the class
+        this.authenticated = authenticated;
+        // Define fields that are accessible when authenticated and non-authenticated
         this.authFields = ['email', 'firstName', 'lastName', 'dob', 'address'];
-        // Define non restricted fields when user is not authenticated
         this.nonAuthFields = ['email', 'firstName', 'lastName'];
     }
 
-    // Find a user by their email (Private)
+    // Find a user by their email (Private, only used within the DAO for obvious reasons)
     async findUserByEmail(email) {
         try {
             // Return the user with the provided email
-            return this.db('users')
+            return this.db()
                 .select('email', 'password_hash')
                 .where({ email })
                 .first();
@@ -43,7 +43,7 @@ class UserDAO {
                 .then(() => bcrypt.hash(password, 10))
                 // Insert the user into the database
                 .then(hashedPassword => {
-                    return this.db('users').insert({ email, password_hash: hashedPassword });
+                    return this.db().insert({ email, password_hash: hashedPassword });
                 });
         } catch (err) {
             // Return an error if failed to create user
@@ -78,16 +78,16 @@ class UserDAO {
     }
 
     // Get user profile by email
-    async getProfile(email, authenticated) {
+    async getProfile(email) {
         try {
             // Check if email is provided
             if (!email) throw new Error('Email is a required parameter');
 
-            // Check if authenticated user is requesting their own profile
-            const select = authenticated && email === authenticated.email ? this.authFields : this.nonAuthFields;
+            // Check if authenticated user is getting their own profile
+            const select = this.authenticated && email === this.authenticated.email ? this.authFields : this.nonAuthFields;
 
             // Retrieve the user profile by email
-            const profile = await this.db('users')
+            const profile = await this.db()
                 .select(select)
                 .where({ email })
                 .first();
@@ -96,7 +96,7 @@ class UserDAO {
             if (!profile) throw new HttpException(404, 'User not found');
 
             // Fix the date on dob (Otherwise it will be returned as a timestamp)
-            if (profile.dob) profile.dob = moment(profile.dob).format('YYYY-MM-DD');
+            if (profile.dob) profile.dob = new Date(profile.dob).toISOString().split('T')[0];
 
             // Return the user profile
             return profile;
@@ -107,7 +107,7 @@ class UserDAO {
     }
 
     // Update user profile
-    async updateProfile(email, profile, authenticated) {
+    async updateProfile(email, profile) {
         try {
             // Set body fields
             const { firstName, lastName, address, dob } = profile;
@@ -125,7 +125,7 @@ class UserDAO {
                 throw new HttpException(400, 'Request body invalid: firstName, lastName and address must be strings only.');
             }
             // Check if authenticated user is updating their own profile
-            if (!authenticated || email !== authenticated.email) {
+            if (!this.authenticated || email !== this.authenticated.email) {
                 throw new HttpException(403, 'Unauthorized');
             }
             // Check if dob is a valid date !/^\d{4}-\d{2}-\d{2}$/.test(dob) || 
@@ -138,10 +138,18 @@ class UserDAO {
             }
 
             // Update the user profile with the provided email
-            return this.db('users')
-                .select(this.restrictedFields)
-                .where({ email })
-                .update(profile);
+            const affectedRows = await this.db()
+                .update(profile)
+                .where({ email });
+
+            // Check if the profile was updated
+            if (affectedRows === 1) {
+                // Return the updated profile
+                return this.getProfile(email);
+            } else {
+                // Return an error if failed to update user profile
+                throw new HttpException(500, 'Failed to update user profile');
+            }
         } catch (err) {
             // Return an error if failed to update user profile
             throw new HttpException(err.status || 500, err.message || 'Failed to update user profile');

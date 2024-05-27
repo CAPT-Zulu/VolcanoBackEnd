@@ -1,7 +1,6 @@
-const express = require('express');
-const router = express.Router();
+const router = require("express").Router();
 const createError = require('http-errors');
-const CountryDAO = require('../dao/country.dao');
+const CountryDAO = require('../../dao/country.dao');
 
 // Register Route middleware
 router.use((req, res, next) => {
@@ -11,7 +10,7 @@ router.use((req, res, next) => {
 });
 
 // Route for fetching all countries associated with volcanoes
-router.get('/', async function (req, res, next) {
+router.get('/', async (req, res, next) => {
     try {
         // Retrieve all countries associated with volcanoes
         const countries = await req.countryDAO.getCountries();
