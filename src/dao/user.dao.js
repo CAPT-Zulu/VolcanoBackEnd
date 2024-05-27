@@ -5,18 +5,20 @@ const bcrypt = require('bcrypt');
 class UserDAO {
     constructor(db, authenticated = false) {
         // Assign the db object to the class
-        this.db = db('users');
+        this.db = () => db.table('users');
         // Assign authenticated status to the class
         this.authenticated = authenticated;
-        // Define fields that are not accessible to non-authenticated users
-        this.nonAuthFields = authenticated ? ['email', 'firstName', 'lastName', 'dob', 'address'] : ['email', 'firstName', 'lastName'];
+        // Define fields that are accessible when authenticated and non-authenticated
+        this.authFields = ['email', 'firstName', 'lastName', 'dob', 'address'];
+        this.nonAuthFields = ['email', 'firstName', 'lastName'];
     }
 
     // Find a user by their email (Private, only used within the DAO for obvious reasons)
     async findUserByEmail(email) {
         try {
             // Return the user with the provided email
-            return this.db.select('email', 'password_hash')
+            return this.db()
+                .select('email', 'password_hash')
                 .where({ email })
                 .first();
         } catch (err) {
@@ -41,7 +43,7 @@ class UserDAO {
                 .then(() => bcrypt.hash(password, 10))
                 // Insert the user into the database
                 .then(hashedPassword => {
-                    return this.db.insert({ email, password_hash: hashedPassword });
+                    return this.db().insert({ email, password_hash: hashedPassword });
                 });
         } catch (err) {
             // Return an error if failed to create user
@@ -81,11 +83,12 @@ class UserDAO {
             // Check if email is provided
             if (!email) throw new Error('Email is a required parameter');
 
-            // Check user is authenticated
-            if (!this.authenticated) throw new HttpException(401, 'Unauthorized');
+            // Check if authenticated user is getting their own profile
+            const select = this.authenticated && email === this.authenticated.email ? this.authFields : this.nonAuthFields;
 
             // Retrieve the user profile by email
-            const profile = await this.db.select(this.nonAuthFields)
+            const profile = await this.db()
+                .select(select)
                 .where({ email })
                 .first();
 
@@ -123,7 +126,7 @@ class UserDAO {
             }
             // Check if authenticated user is updating their own profile
             if (!this.authenticated || email !== this.authenticated.email) {
-                throw new HttpException(401, 'Unauthorized');
+                throw new HttpException(403, 'Unauthorized');
             }
             // Check if dob is a valid date !/^\d{4}-\d{2}-\d{2}$/.test(dob) || 
             if (isNaN(new Date(dob)) || dob !== new Date(dob).toISOString().split('T')[0]) {
@@ -135,9 +138,18 @@ class UserDAO {
             }
 
             // Update the user profile with the provided email
-            return this.db.select(this.nonAuthFields)
-                .where({ email })
-                .update(profile);
+            const affectedRows = await this.db()
+                .update(profile)
+                .where({ email });
+
+            // Check if the profile was updated
+            if (affectedRows === 1) {
+                // Return the updated profile
+                return this.getProfile(email);
+            } else {
+                // Return an error if failed to update user profile
+                throw new HttpException(500, 'Failed to update user profile');
+            }
         } catch (err) {
             // Return an error if failed to update user profile
             throw new HttpException(err.status || 500, err.message || 'Failed to update user profile');
