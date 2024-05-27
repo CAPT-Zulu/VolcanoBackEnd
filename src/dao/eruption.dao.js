@@ -2,14 +2,15 @@ const VolcanoDAO = require("./volcano.dao")
 const UserDAO = require("./user.dao")
 const HttpException = require('../exceptions/HttpException');
 
-class EruptionDAO {
+class EruptionDAO extends VolcanoDAO{
     constructor(db, authenticated = false) {
+        // Call the super class constructor
+        super(db, authenticated);
         // Assign the db object to the class
-        this.db = db('eruption_guesses');
+        this.db = () => db.table('eruption_guesses');
         // Assign authenticated status to the class
         this.authenticated = authenticated;
-        // Mount the VolcanoDAO and UserDAO
-        this.volcanoDAO = new VolcanoDAO(db, authenticated); // Create a new instance of the VolcanoDAO
+        // Mount the UserDAO
         this.userDAO = new UserDAO(db, authenticated); // Create a new instance of the UserDAO
     }
 
@@ -27,13 +28,18 @@ class EruptionDAO {
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoID} not found`);
 
             // Check if the user has already guessed the eruption year
-            const alreadyGuessed = await this.db.where({ volcanoID, userEmail: this.authenticated.email }).first();
+            const alreadyGuessed = await this.db()
+                .where({ volcanoID, userEmail: this.authenticated.email })
+                .first();
 
             // Update or insert the eruption year for the volcano
             if (alreadyGuessed) {
-                return this.db.update({ eruptionYear }).where({ volcanoID, userEmail: this.authenticated.email });
+                return this.db()
+                    .update({ eruptionYear })
+                    .where({ volcanoID, userEmail: this.authenticated.email });
             } else {
-                return this.db.insert({ volcanoID, userEmail: this.authenticated.email, eruptionYear });
+                return this.db()
+                    .insert({ volcanoID, userEmail: this.authenticated.email, eruptionYear });
             }
         } catch (err) {
             // Return an error if failed to set eruption year
@@ -48,7 +54,9 @@ class EruptionDAO {
             if (!volcanoID) throw new HttpException(400, 'Volcano ID is a required parameter');
 
             // Get the eruption guesses for the volcano
-            const guesses = await this.db.select('eruptionYear').where({ volcanoID });
+            const guesses = await this.db()
+                .select('eruptionYear')
+                .where({ volcanoID });
 
             // Return an no eruption guesses found message if no guesses are found
             if (!guesses.length) return { count: `No eruption guesses found for volcano with ID ${volcanoID}`, average: 0, median: 0, min: 0, max: 0 };

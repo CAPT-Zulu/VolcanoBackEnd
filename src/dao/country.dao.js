@@ -4,6 +4,7 @@ const HttpException = require('../exceptions/HttpException');
 // Country Data Access Object 
 class CountryDAO extends VolcanoDAO {
     constructor(db) {
+        // Call the super class constructor
         super(db, false);
     }
 
@@ -11,7 +12,7 @@ class CountryDAO extends VolcanoDAO {
     getCountries() {
         try {
             // Return a list of all countries associated with volcanoes
-            return this.db
+            return this.db()
                 .select('country')
                 .distinct()
                 .orderBy('country', 'asc');

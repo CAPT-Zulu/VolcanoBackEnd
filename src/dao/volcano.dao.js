@@ -5,7 +5,7 @@ class VolcanoDAO {
     // Constructor with a db object
     constructor(db, authenticated = false) {
         // Assign the db object to the class
-        this.db = db('data');
+        this.db = () => db.table('data');
         // Define valid distances for population radius
         this.validDistances = ['5km', '10km', '30km', '100km'];
         // Define fields that are not accessible to non-authenticated users
@@ -21,7 +21,8 @@ class VolcanoDAO {
             if (!id) throw new HttpException(404, 'Volcano ID not found.');
 
             // Retrieve the volcano by id
-            const volcano = await this.db.select(this.nonAuthFields)
+            const volcano = await this.db()
+                .select(this.nonAuthFields)
                 .where('id', id)
                 .first();
 
@@ -53,13 +54,14 @@ class VolcanoDAO {
             }
 
             // Retrieve the volcanoes by custom queries using whereLike for each query
-            const volcanoes = await this.db.select(this.nonAuthFields)
+            const volcanoes = await this.db()
+                .select(this.nonAuthFields)
                 .where(builder => {
                     Object.keys(queries).forEach(query => {
                         builder.where(query, 'like', `%${queries[query]}%`);
                     });
                 });
-            
+
             // Return the volcanoes
             return volcanoes;
         } catch (err) {
@@ -75,7 +77,8 @@ class VolcanoDAO {
             if (!country) throw new HttpException(400, 'Country is a required query parameter.');
 
             // Create a query to get volcanoes by country
-            const query = this.db.select(this.nonAuthFields)
+            const query = this.db()
+                .select(this.nonAuthFields)
                 .where('country', country);
 
             // If population is provided
@@ -107,7 +110,8 @@ class VolcanoDAO {
             if (amount < 1 || amount > 10 || isNaN(amount)) throw new HttpException(400, 'Invalid value for amount. Allowed numbers are between 1-10');
 
             // Get random volcanoes
-            const randomVolcanoes = await this.db.select(this.nonAuthFields)
+            const randomVolcanoes = await this.db()
+                .select(this.nonAuthFields)
                 .orderByRaw('RAND()')
                 .limit(amount);
 
@@ -126,7 +130,8 @@ class VolcanoDAO {
             if (!ids) throw new HttpException(400, 'Volcano IDs are required.');
 
             // Retrieve the volcanoes in the list of ids
-            const volcanoes = await this.db.select(this.nonAuthFields)
+            const volcanoes = await this.db()
+                .select(this.nonAuthFields)
                 .whereIn('id', ids);
 
             // If no volcanoes are found, return an error

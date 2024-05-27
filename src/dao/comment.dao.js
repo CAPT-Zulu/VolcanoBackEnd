@@ -3,14 +3,16 @@ const HttpException = require('../exceptions/HttpException');
 const badWords = require('bad-words');
 
 // comment Data Access Object
-class commentDAO {
+class commentDAO extends VolcanoDAO {
     constructor(db, authenticated = false) {
-        // Assign the db object to the class
-        this.db = db('comments');
-        // Assign additional reports_db object to the class
-        this.reports_db = db('comment_reports');
-        // Mount the VolcanoDAO
-        this.volcanoDAO = new VolcanoDAO(db, authenticated); // Create a new instance of the VolcanoDAO
+        // Call the super class constructor 
+        super(db, authenticated); 
+        // Assign the db and reports_db objects to the class
+        this.db = () => db.table('comments');
+        this.reports_db = () => db.table('comment_reports');
+        // Create a new instance of the bad-words filter
+        this.badWords = new badWords();
+        this.badWords.addWords('Test_bad_word_and_or_inappropriate_content') // Test bad word to be used for testing
     }
 
     // Verify the comment
@@ -25,9 +27,7 @@ class commentDAO {
             if (comment.length > 255) throw new HttpException(400, 'Comment is too long (255 characters max)');
 
             // Check if comment is inappropriate or harmful
-            const filter = new badWords();
-            filter.addWords('Test_bad_word_and_or_inappropriate_content') // Test bad word to be used for testing
-            if (filter.isProfane(comment)) throw new HttpException(400, 'Comment contains inappropriate or harmful content');
+            if (this.badWords.isProfane(comment)) throw new HttpException(400, 'Comment contains inappropriate or harmful content');
 
             // Return success
             return true;
@@ -45,14 +45,15 @@ class commentDAO {
             if (!userEmail) throw new HttpException(401, 'Unauthorized');
 
             // Check if the volcano exists
-            const volcanoExists = await this.volcanoDAO.getVolcanoById(volcanoId);
+            const volcanoExists = await this.getVolcanoById(volcanoId);
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoId} not found`);
 
             // Verify the comment (Attempt to prevent inappropriate or harmful comments)
             await this.verifyComment(comment);
 
             // Attempt to save the comment
-            const commentID = await this.db.insert({ volcanoId, userEmail, comment });
+            const commentID = await this.db()
+                .insert({ volcanoId, userEmail, comment });
 
             // Check if the commentID was returned
             if (!commentID[0]) throw new HttpException(500, 'Failed to save comment');
@@ -73,7 +74,9 @@ class commentDAO {
             if (!userEmail) throw new HttpException(401, 'Unauthorized');
 
             // Check if the comment exists
-            const commentExists = await this.db.where({ commentId }).first();
+            const commentExists = await this.db()
+                .where({ commentId })
+                .first();
             if (!commentExists) throw new HttpException(404, `Comment with ID ${commentId} not found`);
 
             // Check if user is the author of the comment
@@ -83,7 +86,9 @@ class commentDAO {
             await this.verifyComment(comment);
 
             // Attempt to update the comment
-            await this.db.where({ commentId }).update({ comment });
+            await this.db()
+                .update({ comment })
+                .where({ commentId });
 
             // Return success
             return true;
@@ -100,14 +105,18 @@ class commentDAO {
             if (!commentId) throw new HttpException(400, 'The comment ID is a required parameter');
 
             // Check if the comment exists
-            const commentExists = await this.db.where({ commentId }).first();
+            const commentExists = await this.db()
+                .where({ commentId })
+                .first();
             if (!commentExists) throw new HttpException(404, `Comment with ID ${commentId} not found`);
 
             // Check if user is the author of the comment
             if (commentExists.userEmail !== userEmail) throw new HttpException(403, 'User is not the author of the comment');
 
             // Attempt to delete the comment
-            await this.db.where({ commentId }).del();
+            await this.db()
+                .where({ commentId })
+                .del();
 
             // Return success
             return true;
@@ -124,11 +133,13 @@ class commentDAO {
             if (!volcanoId) throw new HttpException(400, 'Volcano ID is a required parameter');
 
             // Check if the volcano exists
-            const volcanoExists = await this.volcanoDAO.getVolcanoById(volcanoId);
+            const volcanoExists = await this.getVolcanoById(volcanoId);
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoId} not found`);
 
             // Get the comments for the volcano
-            const comments = await this.db.select('commentId').where({ volcanoId }); // Add a limit to the number of comments returned
+            const comments = await this.db()
+                .select('commentId')
+                .where({ volcanoId }); // Add a limit to the number of comments returned
 
             // Check if any comments are found
             if (!comments.length) {
@@ -152,23 +163,32 @@ class commentDAO {
             if (!reporterEmail) throw new HttpException(401, 'Unauthorized');
 
             // Check if the comment exists
-            const commentExists = await this.where({ commentId }).first();
+            const commentExists = await this.db()
+                .where({ commentId })
+                .first();
             if (!commentExists) throw new HttpException(404, `comment with ID ${commentId} not found`);
 
             // Check if the user has already reported this comment
-            const alreadyReported = await this.reports_db.where({ commentId, reporterEmail }).first();
+            const alreadyReported = await this.reports_db()
+                .where({ commentId, reporterEmail });
             if (alreadyReported) throw new HttpException(409, `User ${reporterEmail} has already reported comment with ID ${commentId}`);
 
             // Check if the user is the author of the comment
             if (commentExists.userEmail === reporterEmail) throw new HttpException(403, 'User cannot report their own comment');
 
             // Add the report to the comment_reports table
-            await this.reports_db.insert({ commentId, reporterEmail });
+            await this.reports_db()
+                .insert({ commentId, reporterEmail });
 
             // Delete the comment if it has 3 or more reports
-            const updatedComment = await this.reports_db.select('reports').where({ commentId }).first();
+            const updatedComment = await this.reports_db()
+                .select('reports')
+                .where({ commentId })
+                .first();
             if (updatedComment.reports >= 3) {
-                await this.db.where({ commentId }).del();
+                await this.db()
+                    .where({ commentId })
+                    .del();
             }
 
             // Return success
