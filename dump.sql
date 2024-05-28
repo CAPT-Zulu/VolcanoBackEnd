@@ -55,6 +55,7 @@ CREATE TABLE `comments` (
   `volcanoID` int NOT NULL,
   `userEmail` varchar(254) NOT NULL,
   `comment` varchar(254) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`commentID`),
   UNIQUE KEY `commentID_UNIQUE` (`commentID`),
   KEY `volcanoID_comment_idx` (`volcanoID`),
@@ -202,4 +203,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-05-27 22:18:26
+-- Dump completed on 2024-05-28 16:59:24
