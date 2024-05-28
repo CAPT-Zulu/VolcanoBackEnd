@@ -699,7 +699,7 @@
         "tags": [
           "Data"
         ],
-        "description": "Returns a list of volcanoes that match the provided query parameters. All query parameters are optional, but at least one must be provided.",
+        "description": "Returns a list of volcanoes that are 'like' the provided query parameters. All query parameters are optional, but at least one must be provided.",
         "parameters": [
           {
             "name": "name",
@@ -864,37 +864,26 @@
         ],
         "responses": {
           "200": {
-            "description": "An array of comment IDs.",
+            "description": "An array of comments, containing their IDs, comment context and the timestamp they were created at (In UTC +0).",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "integer"
-                  },
-                  "example": [
-                    1,
-                    2,
-                    3
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Missing volcano ID.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "boolean",
-                      "example": "true"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Volcano ID is a required parameter"
+                    "type": "object",
+                    "properties": {
+                      "commentId": {
+                        "type": "number",
+                        "example": 1
+                      },
+                      "comment": {
+                        "type": "string",
+                        "example": "This is a comment"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "example": "2024-05-01T00:00:00.000Z"
+                      }
                     }
                   }
                 }
@@ -978,7 +967,7 @@
             }
           },
           "400": {
-            "description": "Missing volcano ID or comment.",
+            "description": "Missing comment.",
             "content": {
               "application/json": {
                 "schema": {
@@ -990,7 +979,7 @@
                     },
                     "message": {
                       "type": "string",
-                      "example": "The Volcano ID and the comment are required parameters"
+                      "example": "The comment is an required parameter"
                     }
                   }
                 }

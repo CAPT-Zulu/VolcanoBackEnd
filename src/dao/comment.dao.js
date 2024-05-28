@@ -40,8 +40,8 @@ class commentDAO extends VolcanoDAO {
     // Post an comment for a volcano
     async postComment(volcanoId, comment) {
         try {
-            // Check if volcano ID, comment and user are provided
-            if (!volcanoId || !comment) throw new HttpException(400, 'The Volcano ID and the comment are required parameters');
+            // Check if comment ID is provided
+            if (!comment) throw new HttpException(400, 'The comment is an required parameter');
 
             // Check if user is authenticated
             if (!this.authenticated) throw new HttpException(401, 'Unauthorized');
@@ -146,9 +146,6 @@ class commentDAO extends VolcanoDAO {
     // Get all comments for a volcano
     async getComments(volcanoId) {
         try {
-            // Check if volcano ID is provided
-            if (!volcanoId) throw new HttpException(400, 'Volcano ID is a required parameter');
-
             // Check if the volcano exists
             const volcanoExists = await this.getVolcanoById(volcanoId);
             if (!volcanoExists) throw new HttpException(404, `Volcano with ID ${volcanoId} not found`);
@@ -156,7 +153,7 @@ class commentDAO extends VolcanoDAO {
             // Get the comments for the volcano
             const comments = await this.db_com()
                 .select('commentId', 'comment', 'created_at')
-                .where({ volcanoId }); 
+                .where({ volcanoId });
 
             // Check if any comments are found
             if (!comments.length) {
@@ -174,9 +171,6 @@ class commentDAO extends VolcanoDAO {
     // Post a report for a volcano comment (Checking if the comment has been reported 3 times, if so, delete the comment)
     async postReport(volcanoId, commentId) {
         try {
-            // Check if volcano ID and reporter email are provided
-            if (!commentId) throw new HttpException(400, 'comment ID is an required parameter');
-
             // Check if user is authenticated
             if (!this.authenticated) throw new HttpException(401, 'Unauthorized');
 
@@ -207,8 +201,13 @@ class commentDAO extends VolcanoDAO {
                 .count('commentId as reports')
                 .where({ commentId })
                 .first();
+
             // Check if the comment has 3 or more reports
             if (updatedComment.reports >= 3) {
+                // Delete the reports
+                await this.reports_db()
+                    .where({ commentId })
+                    .del();
                 // Delete the comment
                 await this.db_com()
                     .where({ commentId })

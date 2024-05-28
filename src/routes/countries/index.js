@@ -12,6 +12,11 @@ router.use((req, res, next) => {
 // Route for fetching all countries associated with volcanoes
 router.get('/', async (req, res, next) => {
     try {
+        // Reject if any query parameters are provided
+        if (Object.keys(req.query).length > 0) {
+            return next(createError(400, 'Invalid query parameters. No query parameters are permitted.'));
+        }
+
         // Retrieve all countries associated with volcanoes
         const countries = await req.countryDAO.getCountries();
 
