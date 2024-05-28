@@ -17,8 +17,10 @@ class EruptionDAO extends VolcanoDAO {
     // Set the guess year for a volcano eruption
     async setEruptionYearGuess(volcanoID, eruptionYear) {
         try {
-            // Check if volcano ID and eruption year are provided
-            if (!volcanoID || !eruptionYear) throw new HttpException(400, 'Volcano ID and eruption year are required parameters');
+            // Check if volcano ID and eruption year are provided, and if the eruption year is a valid year
+            if (!volcanoID || !eruptionYear || !Number.isInteger(eruptionYear) || eruptionYear < new Date().getFullYear()) {
+                throw new HttpException(400, 'Volcano ID and a valid eruption year are required parameters, and the eruption year must be both a number and a future year.');
+            }
 
             // Check user authentication
             if (!this.authenticated) throw new HttpException(401, 'Unauthorized');

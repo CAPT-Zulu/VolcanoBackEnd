@@ -58,12 +58,12 @@ router.post('/', async (req, res, next) => {
 });
 
 // Remove Saved Volcano Route
-router.delete("/:volcanoID", async (req, res, next) => {
+router.delete("/", async (req, res, next) => {
     try {
         // Check if user is authenticated
         if (req.user) {
-            // Get volcano ID from request parameters
-            const volcanoID = req.params.volcanoID;
+            // Get volcano ID from body
+            const { volcanoID } = req.body;
 
             // Attempt to remove saved volcano
             await req.favoritesDAO.deleteFavorite(volcanoID);
