@@ -69,7 +69,7 @@ app.use((err, req, res, next) => {
     res.status(500);
     res.json({ error: true, message: 'Internal server error', debug: err.message }); // Don't send server side errors to the client
   } else {
-    // Render the error page
+    // Else render the typical error page
     res.status(err.status);
     res.json({ error: true, message: err.message })
   }
@@ -84,8 +84,6 @@ httpsServer.listen(process.env.PORT, () => {
 module.exports = app;
 
 // TODO:
-// - Final test and confirmation of swagger docs / routes / errors / schemas
-// - Dump sql and get azure server running on startup
 // - cry
 
 // Questions:

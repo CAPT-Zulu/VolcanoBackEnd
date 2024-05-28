@@ -3,17 +3,9 @@ module.exports = {
         {
             name: 'volcano-back-end',
             script: './src/app.js',
-            instances: 'max',
+            instances: 0,
             autorestart: true,
             watch: false,
-            env: {
-                NODE_ENV: 'production',
-                PORT: process.env.PORT,
-            },
-            env_production: {
-                NODE_ENV: 'production',
-                PORT: process.env.PORT,
-            },
         },
     ],
 };
