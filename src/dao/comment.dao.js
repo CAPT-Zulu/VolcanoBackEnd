@@ -89,7 +89,6 @@ class commentDAO extends VolcanoDAO {
             if (!commentExists) throw new HttpException(404, `Comment with ID ${commentId} not found`);
 
             // Check if user is the author of the comment
-            console.log(this.authenticated.email, commentExists.userEmail)
             if (this.authenticated.email !== commentExists.userEmail) throw new HttpException(403, 'User is not the author of the comment');
 
             // Verify the comment (Attempt to prevent inappropriate or harmful comments)
@@ -156,8 +155,8 @@ class commentDAO extends VolcanoDAO {
 
             // Get the comments for the volcano
             const comments = await this.db_com()
-                .select('commentId')
-                .where({ volcanoId }); // Add a limit to the number of comments returned
+                .select('commentId', 'comment', 'created_at')
+                .where({ volcanoId }); 
 
             // Check if any comments are found
             if (!comments.length) {

@@ -84,7 +84,6 @@ httpsServer.listen(process.env.PORT, () => {
 module.exports = app;
 
 // TODO:
+// - Test and confirm routes and errors plus schemas
+// - Get server working with auto start
 // - cry
-
-// Questions:
-// - Is rate limiting and maxing number of responses out of scope?
