@@ -67,7 +67,7 @@ app.use((err, req, res, next) => {
     console.error(err);
     // Send JSON response for API errors
     res.status(500);
-    res.json({ error: true, message: 'Internal server error', debug: err.message }); // Don't send server side errors to the client
+    res.json({ error: true, message: 'Internal server error', debug: err.message }); // Don't send server side errors to the client?
   } else {
     // Else render the typical error page
     res.status(err.status);
@@ -84,6 +84,5 @@ httpsServer.listen(process.env.PORT, () => {
 module.exports = app;
 
 // TODO:
-// - Test and confirm routes and errors plus schemas
-// - Get server working with auto start
-// - cry
+// - Hope how I handle errors isn't to strange :(
+// - Check is the error handling is correct
