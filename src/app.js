@@ -82,7 +82,3 @@ httpsServer.listen(process.env.PORT, () => {
 });
 
 module.exports = app;
-
-// TODO:
-// - Hope how I handle errors isn't to strange :(
-// - Check is the error handling is correct

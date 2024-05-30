@@ -9,8 +9,6 @@ router.use((req, res, next) => {
     next();
 });
 
-// TODO: Limit the number of comments returned at a time
-
 // Get comments Route
 router.get("/", async (req, res, next) => {
     try {
